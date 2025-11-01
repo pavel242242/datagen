@@ -1,0 +1,228 @@
+{
+"version": "1.0",
+"metadata": { "name": "EcommerceMultiShop" },
+"timeframe": { "start": "2022-10-08T00:00:00Z", "end": "2025-10-08T23:59:59Z", "freq": "H" },
+"nodes": [
+{
+"id": "shop",
+"kind": "entity",
+"pk": "shop_id",
+"columns": [
+{ "name": "shop_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "company" } } },
+{ "name": "country", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["US","UK","DE","FR","CZ","ES","IT"], "weights_kind": "uniform" } } },
+{ "name": "opened_on", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": { "start": "2022-10-08T00:00:00Z", "end": "2025-06-30T00:00:00Z" }, "freq": "D" } } },
+{ "name": "closed_on", "type": "date", "nullable": true, "generator": { "datetime_series": { "within": { "start": "2025-07-01T00:00:00Z", "end": "2026-12-31T00:00:00Z" }, "freq": "D" } } }
+]
+},
+{
+"id": "vendor",
+"kind": "entity",
+"pk": "vendor_id",
+"columns": [
+{ "name": "vendor_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1001, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "company" } } },
+{ "name": "country", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["US","UK","DE","FR","CZ","CN","PL","NL"], "weights_kind": "uniform" } } }
+]
+},
+{
+"id": "product",
+"kind": "entity",
+"pk": "product_id",
+"columns": [
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 500001, "step": 1 } } },
+{ "name": "vendor_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "vendor.vendor_id" } } },
+{ "name": "sku", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["SKU-A","SKU-B","SKU-C","SKU-D","SKU-E","SKU-F","SKU-G","SKU-H"], "weights_kind": "zipf@1.5" } } },
+{ "name": "category", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Apparel","Electronics","Home","Beauty","Sports","Toys","Grocery","Books"], "weights": [0.2,0.22,0.15,0.1,0.1,0.08,0.1,0.05] } } },
+{ "name": "base_price", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 3.8, "sigma": 0.9 }, "clamp": [3, 1200] } } },
+{ "name": "active_from", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": { "start": "2022-10-08T00:00:00Z", "end": "2025-10-08T00:00:00Z" }, "freq": "D" } } }
+]
+},
+{
+"id": "customer",
+"kind": "entity",
+"pk": "customer_id",
+"columns": [
+{ "name": "customer_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 9000001, "step": 1 } } },
+{ "name": "country", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["US","UK","DE","FR","CZ","ES","IT","PL","NL"], "weights_kind": "uniform" } } },
+{ "name": "full_name", "type": "string", "nullable": false, "generator": { "faker": { "method": "name", "locale_from": "country" } } },
+{ "name": "email", "type": "string", "nullable": false, "generator": { "faker": { "method": "email" } } },
+{ "name": "created_at", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [0.9,0.95,1.0,1.05,1.2,1.15,0.85] } } } }
+]
+},
+{
+"id": "campaign",
+"kind": "entity",
+"pk": "campaign_id",
+"columns": [
+{ "name": "campaign_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 700001, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Holiday Blast","Summer Sale","Back to School","Black Friday","Cyber Monday","New Year Kickoff","Spring Refresh"], "weights_kind": "uniform" } } },
+{ "name": "channel", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Email","Paid Social","Search","Affiliate","Display","Influencer"], "weights": [0.25,0.2,0.25,0.1,0.1,0.1] } } },
+{ "name": "start_at", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "end_at", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": { "start": "2022-10-15T00:00:00Z", "end": "2025-12-31T23:59:59Z" }, "freq": "D" } } },
+{ "name": "discount_multiplier", "type": "float", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 0.9, "high": 1.0 }, "clamp": [0.85, 1.0] } } }
+]
+},
+{
+"id": "growth_effect",
+"kind": "entity",
+"pk": "growth_id",
+"columns": [
+{ "name": "growth_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "phase_name", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Year1","Year2","Year3"], "weights": [0.34,0.33,0.33] } } },
+{ "name": "start_at", "type": "datetime", "nullable": false, "generator": { "choice": { "choices": ["2022-10-08T00:00:00Z","2023-10-08T00:00:00Z","2024-10-08T00:00:00Z"] } } },
+{ "name": "end_at", "type": "datetime", "nullable": false, "generator": { "choice": { "choices": ["2023-10-07T23:59:59Z","2024-10-07T23:59:59Z","2025-10-08T23:59:59Z"] } } },
+{ "name": "turnover_multiplier", "type": "float", "nullable": false, "generator": { "choice": { "choices": [1.0, 2.35, 5.5225] } } }
+]
+},
+{
+"id": "order",
+"kind": "fact",
+"parents": ["shop","customer"],
+"pk": "order_id",
+"fanout": { "distribution": "poisson", "lambda": 6.0, "min": 0, "max": 120 },
+"columns": [
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 110000001, "step": 1 } } },
+{ "name": "shop_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "shop.shop_id" } } },
+{ "name": "customer_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "customer.customer_id" } } },
+{ "name": "campaign_id", "type": "int", "nullable": true, "generator": { "lookup": { "from": "campaign.campaign_id" } } },
+{ "name": "order_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "hour", "weights": [0.2,0.15,0.12,0.1,0.1,0.2,0.6,1.0,1.4,1.8,2.0,1.9,1.7,1.6,1.5,1.6,1.8,2.0,2.1,1.8,1.3,0.9,0.6,0.4] } }, { "transform": "seasonality", "args": { "dimension": "dow", "weights": [0.85,0.95,1.0,1.05,1.25,1.3,1.1] } } ] },
+{ "name": "status", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Paid","Cancelled","Returned"], "weights": [0.94,0.03,0.03] } } },
+{ "name": "gross_amount", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 3.9, "sigma": 0.7 }, "clamp": [5, 3000] } } }
+],
+"modifiers": [
+{ "transform": "effect", "args": { "effect_table": "growth_effect", "on": {}, "window": { "start_col": "start_at", "end_col": "end_at" }, "map": { "field": "turnover_multiplier", "op": "mul", "default": 1.0 } } },
+{ "transform": "effect", "args": { "effect_table": "campaign", "on": { "campaign_id": "campaign_id" }, "window": { "start_col": "start_at", "end_col": "end_at" }, "map": { "field": "discount_multiplier", "op": "mul", "default": 1.0 } } },
+{ "transform": "effect", "args": { "effect_table": "shop", "on": { "shop_id": "shop_id" }, "window": { "start_col": "opened_on", "end_col": "closed_on" }, "map": { "field": "shop_open_multiplier", "op": "mul", "default": 0.0 } } }
+]
+},
+{
+"id": "order_item",
+"kind": "fact",
+"parents": ["order","product"],
+"pk": "order_item_id",
+"fanout": { "distribution": "poisson", "lambda": 2.5, "min": 1, "max": 12 },
+"columns": [
+{ "name": "order_item_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 220000001, "step": 1 } } },
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "order.order_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "unit_price", "type": "float", "nullable": false, "generator": { "lookup": { "from": "product.base_price" } }, "modifiers": [ { "transform": "jitter", "args": { "std": 0.15, "mode": "mul" } }, { "transform": "clamp", "args": { "min": 1.0, "max": 2000.0 } } ] },
+{ "name": "quantity", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 1.4 }, "clamp": [1, 10] } } },
+{ "name": "line_amount", "type": "float", "nullable": false, "generator": { "expression": { "code": "unit_price * quantity" } } }
+]
+},
+{
+"id": "inventory_movement",
+"kind": "fact",
+"parents": ["shop","product"],
+"pk": "movement_id",
+"fanout": { "distribution": "poisson", "lambda": 500.0, "min": 0, "max": 10000 },
+"columns": [
+{ "name": "movement_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 330000001, "step": 1 } } },
+{ "name": "shop_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "shop.shop_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "move_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "hour", "weights": [0.2,0.15,0.12,0.1,0.1,0.15,0.5,1.0,1.4,1.8,2.0,2.1,1.9,1.8,1.7,1.6,1.6,1.7,1.8,1.6,1.3,0.9,0.6,0.4] } }, { "transform": "seasonality", "args": { "dimension": "dow", "weights": [0.9,0.95,1.0,1.05,1.15,1.1,0.85] } } ] },
+{ "name": "movement_type", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Purchase","Sale","Return","Adjustment","TransferIn","TransferOut"], "weights": [0.25,0.55,0.06,0.04,0.05,0.05] } } },
+{ "name": "quantity_change", "type": "int", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 0.0, "std": 3.0 }, "clamp": [-50, 200] } } }
+],
+"modifiers": [
+{ "transform": "effect", "args": { "effect_table": "growth_effect", "on": {}, "window": { "start_col": "start_at", "end_col": "end_at" }, "map": { "field": "turnover_multiplier", "op": "mul", "default": 1.0 } } },
+{ "transform": "effect", "args": { "effect_table": "shop", "on": { "shop_id": "shop_id" }, "window": { "start_col": "opened_on", "end_col": "closed_on" }, "map": { "field": "shop_open_multiplier", "op": "mul", "default": 0.0 } } }
+]
+},
+{
+"id": "purchase_order",
+"kind": "fact",
+"parents": ["shop","vendor"],
+"pk": "po_id",
+"fanout": { "distribution": "poisson", "lambda": 24.0, "min": 0, "max": 500 },
+"columns": [
+{ "name": "po_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 440000001, "step": 1 } } },
+{ "name": "shop_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "shop.shop_id" } } },
+{ "name": "vendor_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "vendor.vendor_id" } } },
+{ "name": "po_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "status", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Created","Approved","Received","Cancelled"], "weights": [0.2,0.3,0.45,0.05] } } }
+],
+"modifiers": [
+{ "transform": "effect", "args": { "effect_table": "growth_effect", "on": {}, "window": { "start_col": "start_at", "end_col": "end_at" }, "map": { "field": "turnover_multiplier", "op": "mul", "default": 1.0 } } },
+{ "transform": "effect", "args": { "effect_table": "shop", "on": { "shop_id": "shop_id" }, "window": { "start_col": "opened_on", "end_col": "closed_on" }, "map": { "field": "shop_open_multiplier", "op": "mul", "default": 0.0 } } }
+]
+},
+{
+"id": "purchase_order_item",
+"kind": "fact",
+"parents": ["purchase_order","product"],
+"pk": "poi_id",
+"fanout": { "distribution": "poisson", "lambda": 8.0, "min": 1, "max": 200 },
+"columns": [
+{ "name": "poi_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 550000001, "step": 1 } } },
+{ "name": "po_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "purchase_order.po_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "unit_cost", "type": "float", "nullable": false, "generator": { "lookup": { "from": "product.base_price" } }, "modifiers": [ { "transform": "jitter", "args": { "std": 0.1, "mode": "mul" } }, { "transform": "clamp", "args": { "min": 1.0, "max": 1500.0 } } ] },
+{ "name": "quantity", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 12.0 }, "clamp": [1, 500] } } },
+{ "name": "line_cost", "type": "float", "nullable": false, "generator": { "expression": { "code": "unit_cost * quantity" } } }
+]
+}
+],
+"constraints": {
+"unique": [
+"shop.shop_id",
+"vendor.vendor_id",
+"product.product_id",
+"customer.customer_id",
+"campaign.campaign_id",
+"growth_effect.growth_id",
+"order.order_id",
+"order_item.order_item_id",
+"inventory_movement.movement_id",
+"purchase_order.po_id",
+"purchase_order_item.poi_id"
+],
+"foreign_keys": [
+{ "from": "product.vendor_id", "to": "vendor.vendor_id" },
+{ "from": "order.shop_id", "to": "shop.shop_id" },
+{ "from": "order.customer_id", "to": "customer.customer_id" },
+{ "from": "order.campaign_id", "to": "campaign.campaign_id" },
+{ "from": "order_item.order_id", "to": "order.order_id" },
+{ "from": "order_item.product_id", "to": "product.product_id" },
+{ "from": "inventory_movement.shop_id", "to": "shop.shop_id" },
+{ "from": "inventory_movement.product_id", "to": "product.product_id" },
+{ "from": "purchase_order.shop_id", "to": "shop.shop_id" },
+{ "from": "purchase_order.vendor_id", "to": "vendor.vendor_id" },
+{ "from": "purchase_order_item.po_id", "to": "purchase_order.po_id" },
+{ "from": "purchase_order_item.product_id", "to": "product.product_id" }
+],
+"ranges": [
+{ "attr": "product.base_price", "min": 3, "max": 1200 },
+{ "attr": "order.gross_amount", "min": 5, "max": 3000 },
+{ "attr": "order_item.unit_price", "min": 1.0, "max": 2000.0 },
+{ "attr": "order_item.quantity", "min": 1, "max": 10 },
+{ "attr": "inventory_movement.quantity_change", "min": -50, "max": 200 },
+{ "attr": "purchase_order_item.unit_cost", "min": 1.0, "max": 1500.0 },
+{ "attr": "purchase_order_item.quantity", "min": 1, "max": 500 }
+],
+"inequalities": [
+{ "left": "campaign.start_at", "op": "<", "right": "campaign.end_at" }
+],
+"enum": [
+{ "attr": "order.status", "values": ["Paid","Cancelled","Returned"] },
+{ "attr": "inventory_movement.movement_type", "values": ["Purchase","Sale","Return","Adjustment","TransferIn","TransferOut"] },
+{ "attr": "campaign.channel", "values": ["Email","Paid Social","Search","Affiliate","Display","Influencer"] },
+{ "attr": "product.category", "values": ["Apparel","Electronics","Home","Beauty","Sports","Toys","Grocery","Books"] }
+]
+},
+"targets": {
+"weekend_share": { "table": "order", "timestamp": "order_time", "min": 0.32, "max": 0.50 },
+"mean_in_range": { "table": "order_item", "column": "quantity", "min": 1.2, "max": 2.2 },
+"composite_effect": {
+"table": "order",
+"metric": "turnover",
+"influences": [
+{ "kind": "seasonality", "dimension": "hour", "weights": [0.2,0.15,0.12,0.1,0.1,0.2,0.6,1.0,1.4,1.8,2.0,1.9,1.7,1.6,1.5,1.6,1.8,2.0,2.1,1.8,1.3,0.9,0.6,0.4] },
+{ "kind": "seasonality", "dimension": "dow", "weights": [0.85,0.95,1.0,1.05,1.25,1.3,1.1] },
+{ "kind": "effect", "table": "growth_effect", "on": {}, "field": "turnover_multiplier", "default": 1.0 }
+],
+"tolerance": { "mae": 0.15, "mape": 0.2 }
+}
+}
+}

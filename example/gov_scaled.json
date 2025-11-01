@@ -1,0 +1,216 @@
+{
+"version": "1.0",
+"metadata": { "name": "DeptOfEducation_Datagen" },
+"timeframe": { "start": "2024-09-01T00:00:00Z", "end": "2025-06-30T23:59:59Z", "freq": "H" },
+"nodes": [
+{
+"id": "district",
+"kind": "entity",
+"pk": "district_id",
+"columns": [
+{ "name": "district_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "company" } } },
+{ "name": "state", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["AL","AK","AZ","AR","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV"], "weights_kind": "uniform" } } },
+{ "name": "locale", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Urban","Suburban","Town","Rural"], "weights": [0.35,0.35,0.15,0.15] } } }
+]
+},
+{
+"id": "school",
+"kind": "fact",
+"parents": ["district"],
+"pk": "school_id",
+"fanout": { "distribution": "poisson", "lambda": 3, "min": 1, "max": 10 },
+"columns": [
+{ "name": "school_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 10001, "step": 1 } } },
+{ "name": "district_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "district.district_id" } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "company" } } },
+{ "name": "level", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Elementary","Middle","High"], "weights": [0.5,0.25,0.25] } } },
+{ "name": "capacity", "type": "int", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 200, "high": 3000 }, "clamp": [200, 3000] } } }
+]
+},
+{
+"id": "staff",
+"kind": "fact",
+"parents": ["school"],
+"pk": "staff_id",
+"fanout": { "distribution": "poisson", "lambda": 8, "min": 3, "max": 20 },
+"columns": [
+{ "name": "staff_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 500001, "step": 1 } } },
+{ "name": "school_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "school.school_id" } } },
+{ "name": "role", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Teacher","Administrator","Counselor","Support"], "weights": [0.75,0.05,0.05,0.15] } } },
+{ "name": "full_time_equivalent", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 1.0, "std": 0.2 }, "clamp": [0.2, 1.5] } } },
+{ "name": "hire_date", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": { "start": "2010-01-01T00:00:00Z", "end": "2025-06-30T23:59:59Z" }, "freq": "D" } } }
+]
+},
+{
+"id": "student",
+"kind": "fact",
+"parents": ["school"],
+"pk": "student_id",
+"fanout": { "distribution": "poisson", "lambda": 50, "min": 20, "max": 100 },
+"columns": [
+{ "name": "student_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1000001, "step": 1 } } },
+{ "name": "school_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "school.school_id" } } },
+{ "name": "first_name", "type": "string", "nullable": false, "generator": { "faker": { "method": "first_name" } } },
+{ "name": "last_name", "type": "string", "nullable": false, "generator": { "faker": { "method": "last_name" } } },
+{ "name": "gender", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["F","M","X"], "weights": [0.49,0.49,0.02] } } },
+{ "name": "birth_date", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": { "start": "2006-01-01T00:00:00Z", "end": "2020-12-31T23:59:59Z" }, "freq": "D" } } },
+{ "name": "grade_level", "type": "int", "nullable": false, "generator": { "choice": { "choices": [1,2,3,4,5,6,7,8,9,10,11,12], "weights_kind": "uniform" } } },
+{ "name": "iep_flag", "type": "bool", "nullable": false, "generator": { "choice": { "choices": [true,false], "weights": [0.13,0.87] } } }
+]
+},
+{
+"id": "course",
+"kind": "fact",
+"parents": ["school"],
+"pk": "course_id",
+"fanout": { "distribution": "poisson", "lambda": 8, "min": 5, "max": 15 },
+"columns": [
+{ "name": "course_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 2000001, "step": 1 } } },
+{ "name": "school_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "school.school_id" } } },
+{ "name": "subject", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Math","English","Science","History","Art","Music","PE","Computer Science","Foreign Language"], "weights_kind": "head_tail@{0.6,1.5}" } } },
+{ "name": "course_level", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Regular","Honors","AP"], "weights": [0.7,0.2,0.1] } } },
+{ "name": "credits", "type": "float", "nullable": false, "generator": { "choice": { "choices": [0.5,1.0], "weights": [0.3,0.7] } } }
+]
+},
+{
+"id": "enrollment",
+"kind": "fact",
+"parents": ["student","course"],
+"pk": "enrollment_id",
+"fanout": { "distribution": "poisson", "lambda": 6, "min": 4, "max": 8 },
+"columns": [
+{ "name": "enrollment_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 30000001, "step": 1 } } },
+{ "name": "student_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "student.student_id" } } },
+{ "name": "course_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "course.course_id" } } },
+{ "name": "status", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Active","Dropped","Completed"], "weights": [0.9,0.05,0.05] } } }
+]
+},
+{
+"id": "class_meeting",
+"kind": "fact",
+"parents": ["course"],
+"pk": "meeting_id",
+"fanout": { "distribution": "poisson", "lambda": 10, "min": 5, "max": 20 },
+"columns": [
+{ "name": "meeting_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 40000001, "step": 1 } } },
+{ "name": "course_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "course.course_id" } } },
+{ "name": "start_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [1.0,1.1,1.1,1.1,1.0,0.2,0.1] } } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "hour", "weights": [0.1,0.05,0.05,0.05,0.05,0.1,0.6,1.2,1.5,1.5,1.3,1.2,1.0,1.0,1.0,1.2,1.4,1.3,0.8,0.4,0.2,0.1,0.05,0.05] } }, { "transform": "time_jitter", "args": { "std_minutes": 10 } }, { "transform": "effect", "args": { "effect_table": "calendar_effects", "on": {}, "window": { "start_col": "start_ts", "end_col": "end_ts" }, "map": { "field": "multiplier", "op": "mul", "default": 1.0 } } } ] },
+{ "name": "end_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "room", "type": "string", "nullable": true, "generator": { "choice": { "choices": ["A101","A102","A201","B110","B210","C305","Gym","Lab1","Lab2"], "weights_kind": "zipf@1.5" } } }
+]
+},
+{
+"id": "attendance",
+"kind": "fact",
+"parents": ["enrollment"],
+"pk": "attendance_id",
+"fanout": { "distribution": "poisson", "lambda": 10, "min": 5, "max": 20 },
+"columns": [
+{ "name": "attendance_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 50000001, "step": 1 } } },
+{ "name": "enrollment_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "enrollment.enrollment_id" } } },
+{ "name": "timestamp", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [1.0,1.1,1.1,1.1,1.0,0.2,0.1] } } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "hour", "weights": [0.05,0.05,0.05,0.05,0.05,0.1,0.6,1.2,1.5,1.5,1.3,1.2,1.0,1.0,1.0,1.2,1.4,1.3,0.8,0.4,0.2,0.1,0.05,0.05] } }, { "transform": "effect", "args": { "effect_table": "calendar_effects", "on": {}, "window": { "start_col": "start_ts", "end_col": "end_ts" }, "map": { "field": "multiplier", "op": "mul", "default": 1.0 } } } ] },
+{ "name": "status", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Present","Absent","Tardy","Excused"], "weights": [0.9,0.05,0.03,0.02] } } }
+]
+},
+{
+"id": "assessment",
+"kind": "fact",
+"parents": ["enrollment"],
+"pk": "assessment_id",
+"fanout": { "distribution": "poisson", "lambda": 5, "min": 0, "max": 10 },
+"columns": [
+{ "name": "assessment_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 60000001, "step": 1 } } },
+{ "name": "enrollment_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "enrollment.enrollment_id" } } },
+{ "name": "course_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "enrollment.course_id" } } },
+{ "name": "assessment_date", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D", "pattern": { "dimension": "dow", "weights": [0.8,1.1,1.2,1.2,1.0,0.4,0.3] } } } },
+{ "name": "score", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 78, "std": 12 }, "clamp": [0, 100] } } },
+{ "name": "credits", "type": "float", "nullable": false, "generator": { "lookup": { "from": "course.credits", "on": { "this_key": "course_id" } } } },
+{ "name": "grade_points", "type": "float", "nullable": false, "generator": { "expression": { "code": "score / 20 * credits" } }, "modifiers": [ { "transform": "clamp", "args": { "min": 0.0, "max": 5.0 } } ] }
+]
+},
+{
+"id": "funding_event",
+"kind": "fact",
+"parents": ["school"],
+"pk": "funding_event_id",
+"fanout": { "distribution": "poisson", "lambda": 3, "min": 0, "max": 12 },
+"columns": [
+{ "name": "funding_event_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 70000001, "step": 1 } } },
+{ "name": "school_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "school.school_id" } } },
+{ "name": "timestamp", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "M" } } },
+{ "name": "amount_usd", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 10.5, "sigma": 0.8 }, "clamp": [1000, 500000] } } },
+{ "name": "source", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Federal","State","Local","Grant","Donation"], "weights": [0.3,0.3,0.25,0.1,0.05] } } }
+]
+},
+{
+"id": "calendar_effects",
+"kind": "entity",
+"pk": "effect_id",
+"columns": [
+{ "name": "effect_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 90000001, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Holiday","In-Service Day","Snow Day","Exam Week"], "weights": [0.6,0.2,0.1,0.1] } } },
+{ "name": "start_ts", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "M" } } },
+{ "name": "end_ts", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "M" } } },
+{ "name": "multiplier", "type": "float", "nullable": false, "generator": { "choice": { "choices": [0.0, 0.2, 0.5, 0.8, 1.2], "weights": [0.25,0.25,0.25,0.2,0.05] } } }
+]
+}
+],
+"constraints": {
+"unique": [
+"district.district_id",
+"school.school_id",
+"staff.staff_id",
+"student.student_id",
+"course.course_id",
+"enrollment.enrollment_id",
+"class_meeting.meeting_id",
+"attendance.attendance_id",
+"assessment.assessment_id",
+"funding_event.funding_event_id",
+"calendar_effects.effect_id"
+],
+"foreign_keys": [
+{ "from": "school.district_id", "to": "district.district_id" },
+{ "from": "staff.school_id", "to": "school.school_id" },
+{ "from": "student.school_id", "to": "school.school_id" },
+{ "from": "course.school_id", "to": "school.school_id" },
+{ "from": "enrollment.student_id", "to": "student.student_id" },
+{ "from": "enrollment.course_id", "to": "course.course_id" },
+{ "from": "class_meeting.course_id", "to": "course.course_id" },
+{ "from": "attendance.enrollment_id", "to": "enrollment.enrollment_id" },
+{ "from": "assessment.enrollment_id", "to": "enrollment.enrollment_id" },
+{ "from": "assessment.course_id", "to": "course.course_id" },
+{ "from": "funding_event.school_id", "to": "school.school_id" }
+],
+"ranges": [
+{ "attr": "staff.full_time_equivalent", "min": 0.2, "max": 1.5 },
+{ "attr": "school.capacity", "min": 200, "max": 3000 },
+{ "attr": "course.credits", "min": 0.5, "max": 1.0 },
+{ "attr": "assessment.score", "min": 0, "max": 100 },
+{ "attr": "assessment.grade_points", "min": 0, "max": 5 },
+{ "attr": "funding_event.amount_usd", "min": 1000, "max": 500000 }
+],
+"inequalities": [
+{ "left": "calendar_effects.start_ts", "op": "<", "right": "calendar_effects.end_ts" }
+],
+"enum": [
+{ "attr": "school.level", "values": ["Elementary","Middle","High"] },
+{ "attr": "attendance.status", "values": ["Present","Absent","Tardy","Excused"] }
+]
+},
+"targets": {
+"weekend_share": { "table": "attendance", "timestamp": "timestamp", "min": 0.0, "max": 0.08 },
+"mean_in_range": { "table": "assessment", "column": "score", "min": 70.0, "max": 85.0 },
+"composite_effect": {
+"table": "class_meeting",
+"metric": "occurrence_rate",
+"influences": [
+{ "kind": "seasonality", "dimension": "dow", "weights": [1.0,1.1,1.1,1.1,1.0,0.2,0.1] },
+{ "kind": "seasonality", "dimension": "hour", "weights": [0.1,0.05,0.05,0.05,0.05,0.1,0.6,1.2,1.5,1.5,1.3,1.2,1.0,1.0,1.0,1.2,1.4,1.3,0.8,0.4,0.2,0.1,0.05,0.05] },
+{ "kind": "outliers", "rate": 0.005, "mode": "drop" }
+],
+"tolerance": { "mae": 0.05, "mape": 10.0 }
+}
+}
+}

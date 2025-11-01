@@ -1,0 +1,86 @@
+{
+  "name": "SÚKL Open Data Extractor",
+  "description": "AI-powered extraction of Czech pharmaceutical open data from SÚKL (State Institute for Drug Control)",
+  "version": "1.0.0",
+  "type": "extractor",
+  "categories": ["public-data"],
+  "data": {
+    "definition": {
+      "type": "aws-ecr",
+      "uri": "147946154733.dkr.ecr.us-east-1.amazonaws.com/keboola-component"
+    }
+  },
+  "ui": {
+    "parameters": [
+      {
+        "id": "datasets",
+        "label": "Datasets to extract",
+        "type": "multiselect",
+        "default": ["dlp"],
+        "options": [
+          {
+            "value": "dlp",
+            "label": "Medicines Database (DLP)"
+          },
+          {
+            "value": "pharmacies",
+            "label": "Pharmacy List"
+          },
+          {
+            "value": "lek13",
+            "label": "LEK-13 Dispensing Reports"
+          },
+          {
+            "value": "dis13",
+            "label": "DIS-13 Distribution Reports"
+          },
+          {
+            "value": "erecept",
+            "label": "eRecept Prescription Data"
+          }
+        ],
+        "description": "Select which datasets to extract from SÚKL"
+      },
+      {
+        "id": "bucket_id",
+        "label": "Storage Bucket ID",
+        "type": "string",
+        "default": "in.c-sukl",
+        "description": "Keboola Storage bucket where data will be loaded"
+      }
+    ],
+    "credentials": [
+      {
+        "id": "#anthropic_api_key",
+        "label": "Anthropic API Key",
+        "type": "string",
+        "encrypted": true,
+        "required": true,
+        "description": "Claude AI API key for intelligent URL discovery"
+      },
+      {
+        "id": "#kbc_token",
+        "label": "Keboola Storage Token",
+        "type": "string",
+        "encrypted": true,
+        "required": true,
+        "description": "Storage API token with read/write permissions"
+      }
+    ]
+  },
+  "configuration": {
+    "parameters": {
+      "datasets": ["dlp"],
+      "bucket_id": "in.c-sukl"
+    }
+  },
+  "actions": [],
+  "scheduling": {
+    "type": "cron",
+    "cron": "0 2 * * 1",
+    "description": "Weekly on Monday at 2 AM"
+  },
+  "logger": {
+    "type": "standard"
+  }
+}

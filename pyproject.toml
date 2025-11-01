@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datagen"
+version = "0.1.0"
+description = "Universal, schema-first synthetic dataset generator"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Datagen Team"}
+]
+dependencies = [
+    "pydantic>=2.0",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pyarrow>=12.0",
+    "faker>=18.0",
+    "networkx>=3.1",
+    "click>=8.1",
+    "jsonschema>=4.17",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+llm = [
+    "anthropic>=0.25",
+    "pycountry>=22.3",
+    "babel>=2.12",
+]
+keboola = [
+    "kbcstorage>=1.1",
+    "python-dotenv>=1.0",
+]
+dev = [
+    "pytest>=7.3",
+    "pytest-cov>=4.1",
+    "black>=23.3",
+    "ruff>=0.0.270",
+]
+
+[project.scripts]
+datagen = "datagen.cli.commands:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"

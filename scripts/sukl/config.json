@@ -1,0 +1,57 @@
+{
+  "datasets": {
+    "dlp": {
+      "name": "Medicines Database",
+      "url": "https://opendata.sukl.cz/soubory/SOD20250926/DLP20250926.zip",
+      "encoding": "cp1250",
+      "format": "zip",
+      "update_frequency": "monthly",
+      "keboola_prefix": "dlp"
+    },
+    "pharmacies": {
+      "name": "Pharmacy List",
+      "url": "https://opendata.sukl.cz/soubory/SOD20250926/LEKARNY20250926.zip",
+      "encoding": "cp1250",
+      "format": "zip",
+      "update_frequency": "monthly",
+      "keboola_prefix": "pharmacies"
+    },
+    "lek13": {
+      "name": "Pharmacy Dispensing Reports",
+      "url": "https://opendata.sukl.cz/soubory/LEK13/LEK13_2024/LEK13_2024.zip",
+      "encoding": "cp1250",
+      "format": "zip",
+      "update_frequency": "monthly",
+      "keboola_prefix": "lek13"
+    },
+    "dis13": {
+      "name": "Distribution Reports",
+      "url": "https://opendata.sukl.cz/soubory/DIS13/DIS13_202509v01.csv",
+      "encoding": "cp1250",
+      "format": "csv",
+      "update_frequency": "monthly",
+      "keboola_prefix": "dis13"
+    },
+    "erecept_prescriptions": {
+      "name": "eRecept Prescriptions",
+      "url": "https://opendata.sukl.cz/soubory/ERECEPT/erecept_predpis_202509.zip",
+      "encoding": "utf-8",
+      "format": "zip",
+      "update_frequency": "monthly",
+      "keboola_prefix": "erecept_prescriptions"
+    },
+    "erecept_dispensations": {
+      "name": "eRecept Dispensations",
+      "url": "https://opendata.sukl.cz/soubory/ERECEPT/erecept_vydej_202509.zip",
+      "encoding": "utf-8",
+      "format": "zip",
+      "update_frequency": "monthly",
+      "keboola_prefix": "erecept_dispensations"
+    }
+  },
+  "keboola": {
+    "bucket": "in.c-sukl"
+  },
+  "download_dir": "data/sukl",
+  "output_dir": "data/sukl_processed"
+}

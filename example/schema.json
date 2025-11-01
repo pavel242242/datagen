@@ -1,0 +1,350 @@
+{
+  "version": "1.0",
+  "seed_strategy": { "master": 42, "derive": "hash(entity,partition)" },
+
+  "timeframe": { "start": "2024-01-01T00:00:00Z", "end": "2025-06-30T23:59:59Z", "freq": "Minutes" },
+
+  "nodes": [
+    {
+      "id": "customer",
+      "kind": "entity",
+      "pk": "customer_id",
+      "columns": [
+        {"name": "customer_id", "type": "int"},
+        {"name": "name", "type": "string"},
+        {"name": "email", "type": "string"},
+        {"name": "phone", "type": "string"},
+        {"name": "address", "type": "string"},
+        {"name": "city", "type": "string"},
+        {"name": "signup_date", "type": "datetime"},
+        {"name": "is_premium", "type": "bool"},
+        {"name": "segment", "type": "string"},
+        {"name": "reorder_profile_id", "type": "int"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "driver",
+      "kind": "entity",
+      "pk": "driver_id",
+      "columns": [
+        {"name": "driver_id", "type": "int"},
+        {"name": "name", "type": "string"},
+        {"name": "phone", "type": "string"},
+        {"name": "vehicle_type", "type": "string"},
+        {"name": "license_plate", "type": "string"},
+        {"name": "hire_date", "type": "datetime"},
+        {"name": "rating", "type": "float"},
+        {"name": "city", "type": "string"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "store",
+      "kind": "entity",
+      "pk": "store_id",
+      "columns": [
+        {"name": "store_id", "type": "int"},
+        {"name": "name", "type": "string"},
+        {"name": "address", "type": "string"},
+        {"name": "city", "type": "string"},
+        {"name": "store_type", "type": "string"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "product",
+      "kind": "entity",
+      "pk": "product_id",
+      "columns": [
+        {"name": "product_id", "type": "int"},
+        {"name": "name", "type": "string"},
+        {"name": "category", "type": "string"},
+        {"name": "base_price", "type": "float"},
+        {"name": "shelf_life_days", "type": "int"},
+        {"name": "is_active", "type": "bool"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "price_event",
+      "kind": "fact",
+      "pk": "event_id",
+      "columns": [
+        {"name": "event_id", "type": "int"},
+        {"name": "effective_ts", "type": "datetime"},
+        {"name": "category", "type": "string"},
+        {"name": "price_delta_pct", "type": "float"},
+        {"name": "reason", "type": "string"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "weather_hourly",
+      "kind": "fact",
+      "pk": "weather_id",
+      "columns": [
+        {"name": "weather_id", "type": "int"},
+        {"name": "city", "type": "string"},
+        {"name": "ts", "type": "datetime"},
+        {"name": "temp_c", "type": "float"},
+        {"name": "precip_mm", "type": "float"},
+        {"name": "condition", "type": "string"}
+      ],
+      "parents": []
+    },
+
+    {
+      "id": "order",
+      "kind": "fact",
+      "pk": "order_id",
+      "columns": [
+        {"name": "order_id", "type": "int"},
+        {"name": "customer_id", "type": "int"},
+        {"name": "store_id", "type": "int"},
+        {"name": "city", "type": "string"},
+        {"name": "order_date", "type": "datetime"},
+        {"name": "delivery_date", "type": "datetime"},
+        {"name": "promised_eta_min", "type": "int"},
+        {"name": "delay_min", "type": "int"},
+        {"name": "total_amount", "type": "float"},
+        {"name": "status", "type": "string"},
+        {"name": "is_express", "type": "bool"},
+        {"name": "cancelled", "type": "bool"}
+      ],
+      "parents": ["customer", "store"],
+      "fanout": { "min": 0, "max": 50, "distribution": "poisson", "lambda": 8 }
+    },
+
+    {
+      "id": "order_item",
+      "kind": "fact",
+      "pk": "order_item_id",
+      "columns": [
+        {"name": "order_item_id", "type": "int"},
+        {"name": "order_id", "type": "int"},
+        {"name": "product_id", "type": "int"},
+        {"name": "product_name", "type": "string"},
+        {"name": "category", "type": "string"},
+        {"name": "quantity", "type": "int"},
+        {"name": "list_price", "type": "float"},
+        {"name": "promo_mult", "type": "float"},
+        {"name": "unit_price", "type": "float"},
+        {"name": "total_price", "type": "float"}
+      ],
+      "parents": ["order", "product"],
+      "fanout": { "min": 1, "max": 30, "distribution": "poisson", "lambda": 5 }
+    },
+
+    {
+      "id": "inventory_snapshot",
+      "kind": "fact",
+      "pk": "inv_id",
+      "columns": [
+        {"name": "inv_id", "type": "int"},
+        {"name": "store_id", "type": "int"},
+        {"name": "product_id", "type": "int"},
+        {"name": "date", "type": "date"},
+        {"name": "on_hand", "type": "int"},
+        {"name": "reorder_point", "type": "int"},
+        {"name": "lead_time_days", "type": "int"}
+      ],
+      "parents": ["store", "product"]
+    },
+
+    {
+      "id": "stockout_event",
+      "kind": "fact",
+      "pk": "stockout_id",
+      "columns": [
+        {"name": "stockout_id", "type": "int"},
+        {"name": "store_id", "type": "int"},
+        {"name": "product_id", "type": "int"},
+        {"name": "ts", "type": "datetime"},
+        {"name": "duration_min", "type": "int"}
+      ],
+      "parents": ["inventory_snapshot"]
+    },
+
+    {
+      "id": "delivery",
+      "kind": "fact",
+      "pk": "delivery_id",
+      "columns": [
+        {"name": "delivery_id", "type": "int"},
+        {"name": "order_id", "type": "int"},
+        {"name": "driver_id", "type": "int"},
+        {"name": "pickup_time", "type": "datetime"},
+        {"name": "delivery_time", "type": "datetime"},
+        {"name": "distance_km", "type": "float"},
+        {"name": "delivery_fee", "type": "float"},
+        {"name": "weather_condition", "type": "string"},
+        {"name": "traffic_level", "type": "int"},
+        {"name": "service_minutes", "type": "int"}
+      ],
+      "parents": ["order", "driver"],
+      "fanout": { "min": 0, "max": 1, "distribution": "poisson", "lambda": 0.85 }
+    },
+
+    {
+      "id": "customer_satisfaction",
+      "kind": "fact",
+      "pk": "satisfaction_id",
+      "columns": [
+        {"name": "satisfaction_id", "type": "int"},
+        {"name": "order_id", "type": "int"},
+        {"name": "customer_id", "type": "int"},
+        {"name": "rating", "type": "int"},
+        {"name": "food_quality_rating", "type": "int"},
+        {"name": "delivery_rating", "type": "int"},
+        {"name": "comment", "type": "string"},
+        {"name": "survey_date", "type": "datetime"}
+      ],
+      "parents": ["order", "customer"],
+      "fanout": { "min": 0, "max": 1, "distribution": "poisson", "lambda": 0.6 }
+    },
+
+    {
+      "id": "driver_shift",
+      "kind": "fact",
+      "pk": "shift_id",
+      "columns": [
+        {"name": "shift_id", "type": "int"},
+        {"name": "driver_id", "type": "int"},
+        {"name": "city", "type": "string"},
+        {"name": "shift_date", "type": "datetime"},
+        {"name": "start_time", "type": "datetime"},
+        {"name": "end_time", "type": "datetime"},
+        {"name": "hours_worked", "type": "float"},
+        {"name": "deliveries_completed", "type": "int"},
+        {"name": "total_distance_km", "type": "float"},
+        {"name": "on_time_ratio", "type": "float"}
+      ],
+      "parents": ["driver"],
+      "fanout": { "min": 20, "max": 100, "distribution": "poisson", "lambda": 60 }
+    }
+  ],
+
+  "behaviors": {
+    "seasonality": {
+      "order_weekly": { "Fri": 0.30, "Sat": 0.20, "Sun": 0.05 },
+      "order_monthly": { "Jan": -0.10, "Feb": 0.00, "Mar": 0.05, "Apr": 0.08, "May": 0.12, "Jun": 0.10 },
+      "category_weekly": {
+        "Electronics": { "Mon": 0.05 },
+        "Groceries": { "Sat": 0.15, "Sun": 0.10 },
+        "HotFood": { "Fri": 0.10, "Sat": 0.15 },
+        "ColdDrinks": { "Jun": 0.18 }
+      }
+    },
+
+    "weather_effects": {
+      "demand_uplift": {
+        "rain": { "Groceries": 0.08, "HotFood": 0.15 },
+        "snow": { "Groceries": 0.12, "HotFood": 0.20 },
+        "heatwave": { "ColdDrinks": 0.25, "IceCream": 0.35 },
+        "storm": { "Electronics": -0.05 }
+      },
+      "delivery_delay_min": { "rain": 6, "snow": 15, "storm": 25, "heatwave": 3 }
+    },
+
+    "price_shocks": [
+      { "id": "Q2_electronics_hike", "effective_ts": "2024-05-10T00:00:00Z", "category": "Electronics", "price_delta_pct": 0.08, "reason": "Supplier Increase" },
+      { "id": "Q1_groceries_sale", "effective_ts": "2024-03-01T00:00:00Z", "category": "Groceries", "price_delta_pct": -0.05, "reason": "Promo" }
+    ],
+    "elasticities": { "Electronics": -0.6, "Groceries": -0.2, "HotFood": -0.4, "ColdDrinks": -0.8, "IceCream": -1.0 },
+
+    "stockouts": { "cancel_prob": 0.30, "backorder_delay_min": [30, 180] },
+
+    "ops_capacity": { "driver_shortage_delay_perc": 0.15, "express_bias_min": -10 },
+
+    "customer_reorder": {
+      "habit_share": 0.80,
+      "cadence_days": { "median": 10, "jitter_days": 4 },
+      "basket_memory_len": 5,
+      "affinity_model": {
+        "mode": "sticky_mixture",
+        "category_prior": {
+          "Groceries": 0.30, "HotFood": 0.18, "ColdDrinks": 0.12,
+          "Electronics": 0.15, "Books": 0.10, "Home": 0.10, "IceCream": 0.05
+        },
+        "segment_bias": {
+          "premium": { "Groceries": -0.05, "Electronics": 0.06, "HotFood": 0.02 },
+          "standard": { "Groceries": 0.04, "Electronics": -0.03 }
+        },
+        "stickiness": { "p_keep_prev_items": 0.55, "p_keep_prev_categories": 0.70 },
+        "novelty_prob": 0.20,
+        "novelty_zipf_s": 1.15
+      }
+    }
+  },
+
+  "constraints": {
+    "unique": [
+      "customer.customer_id", "driver.driver_id", "store.store_id", "product.product_id",
+      "order.order_id", "order_item.order_item_id", "delivery.delivery_id",
+      "customer_satisfaction.satisfaction_id", "driver_shift.shift_id",
+      "inventory_snapshot.inv_id", "price_event.event_id", "weather_hourly.weather_id", "stockout_event.stockout_id"
+    ],
+    "foreign_keys": [
+      { "from": "order.customer_id", "to": "customer.customer_id" },
+      { "from": "order.store_id", "to": "store.store_id" },
+      { "from": "order.city", "to": "store.city" },
+      { "from": "order_item.order_id", "to": "order.order_id" },
+      { "from": "order_item.product_id", "to": "product.product_id" },
+      { "from": "delivery.order_id", "to": "order.order_id" },
+      { "from": "delivery.driver_id", "to": "driver.driver_id" },
+      { "from": "inventory_snapshot.store_id", "to": "store.store_id" },
+      { "from": "inventory_snapshot.product_id", "to": "product.product_id" },
+      { "from": "stockout_event.store_id", "to": "store.store_id" },
+      { "from": "stockout_event.product_id", "to": "product.product_id" },
+      { "from": "customer_satisfaction.order_id", "to": "order.order_id" },
+      { "from": "customer_satisfaction.customer_id", "to": "customer.customer_id" },
+      { "from": "driver_shift.driver_id", "to": "driver.driver_id" },
+      { "from": "driver_shift.city", "to": "driver.city" }
+    ],
+    "inequalities": [
+      { "left": "order.order_date", "op": "<", "right": "delivery.delivery_time" },
+      { "left": "delivery.pickup_time", "op": "<=", "right": "delivery.delivery_time" },
+      { "left": "driver_shift.start_time", "op": "<", "right": "driver_shift.end_time" }
+    ],
+    "ranges": [
+      { "attr": "order_item.quantity", "min": 1, "max": 20 },
+      { "attr": "order_item.unit_price", "min": 0.10, "max": 100000.0 },
+      { "attr": "order.total_amount", "min": 0.10, "max": 1000000.0 },
+      { "attr": "delivery.traffic_level", "min": 1, "max": 5 },
+      { "attr": "customer_satisfaction.rating", "min": 1, "max": 5 },
+      { "attr": "customer_satisfaction.food_quality_rating", "min": 1, "max": 5 },
+      { "attr": "customer_satisfaction.delivery_rating", "min": 1, "max": 5 },
+      { "attr": "inventory_snapshot.on_hand", "min": 0, "max": 1000000 }
+    ],
+    "cross_rules": [
+      { "if": "order.cancelled == true", "then": "no delivery and no order_item for that order" }
+    ]
+  },
+
+  "quality_targets": {
+    "weekend_order_share": { "min": 0.30, "max": 0.45 },
+    "on_time_rate_min": 0.82,
+    "weather_uplift_bounds": { "rain": [0.05, 0.20], "snow": [0.08, 0.25] },
+    "price_shock_volume_drop": { "Electronics": [0.05, 0.15] },
+    "habitual_reorder_share": 0.80
+  },
+
+  "output": { "format": "parquet", "partition_by": ["city", "order_date"] },
+
+  "dag": [
+    ["customer", "driver", "store", "product"],
+    ["price_event", "weather_hourly"],
+    ["order"],
+    ["order_item"],
+    ["inventory_snapshot"],
+    ["stockout_event", "delivery"],
+    ["customer_satisfaction", "driver_shift"]
+  ]
+}
+

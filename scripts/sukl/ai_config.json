@@ -1,0 +1,51 @@
+{
+  "datasets": {
+    "dlp": {
+      "name": "Medicines Database (DLP)",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/databaze-lecivych-pripravku-dlp",
+      "encoding": "cp1250",
+      "format": "zip",
+      "keboola_prefix": "dlp"
+    },
+    "pharmacies": {
+      "name": "Pharmacy List",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/seznam-lekaren",
+      "encoding": "cp1250",
+      "format": "zip",
+      "keboola_prefix": "pharmacies"
+    },
+    "lek13": {
+      "name": "Pharmacy Dispensing Reports (LEK-13)",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/lek-13",
+      "encoding": "cp1250",
+      "format": "zip",
+      "keboola_prefix": "lek13"
+    },
+    "dis13": {
+      "name": "Distribution Reports (DIS-13)",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/dis-13",
+      "encoding": "cp1250",
+      "format": "csv",
+      "keboola_prefix": "dis13"
+    },
+    "erecept_prescriptions": {
+      "name": "eRecept Prescriptions",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/predepsane-vydane-lecive-pripravky-ze-systemu-erecept",
+      "encoding": "utf-8",
+      "format": "zip",
+      "keboola_prefix": "erecept_prescriptions"
+    },
+    "erecept_dispensations": {
+      "name": "eRecept Dispensations",
+      "catalog_url": "https://opendata.sukl.cz/?q=katalog/predepsane-vydane-lecive-pripravky-ze-systemu-erecept",
+      "encoding": "utf-8",
+      "format": "zip",
+      "keboola_prefix": "erecept_dispensations"
+    }
+  },
+  "keboola": {
+    "bucket": "in.c-sukl"
+  },
+  "download_dir": "data/sukl_ai",
+  "output_dir": "data/sukl_ai_processed"
+}

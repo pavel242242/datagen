@@ -1,0 +1,276 @@
+{
+"version": "1.0",
+"metadata": { "name": "FoodDeliveryDatagen" },
+"timeframe": { "start": "2024-01-01T00:00:00Z", "end": "2025-06-30T23:59:59Z", "freq": "T" },
+"nodes": [
+{
+"id": "customer",
+"kind": "entity",
+"pk": "customer_id",
+"columns": [
+{ "name": "customer_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "name" } } },
+{ "name": "email", "type": "string", "nullable": false, "generator": { "faker": { "method": "email" } } },
+{ "name": "phone", "type": "string", "nullable": false, "generator": { "faker": { "method": "phone_number" } } },
+{ "name": "address", "type": "string", "nullable": false, "generator": { "faker": { "method": "address" } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Prague", "Brno", "Ostrava", "Plzen"], "weights_kind": "uniform" } } },
+{ "name": "signup_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "is_premium", "type": "bool", "nullable": false, "generator": { "choice": { "choices": [true, false], "weights": [0.25, 0.75] } } },
+{ "name": "segment", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["premium", "standard"], "weights": [0.25, 0.75] } } },
+{ "name": "reorder_profile_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 100000, "step": 1 } } }
+]
+},
+{
+"id": "driver",
+"kind": "entity",
+"pk": "driver_id",
+"columns": [
+{ "name": "driver_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "name" } } },
+{ "name": "phone", "type": "string", "nullable": false, "generator": { "faker": { "method": "phone_number" } } },
+{ "name": "vehicle_type", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["car", "bike", "scooter", "van"] } } },
+{ "name": "license_plate", "type": "string", "nullable": false, "generator": { "faker": { "method": "license_plate" } } },
+{ "name": "hire_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "rating", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 4.6, "std": 0.3 }, "clamp": [3.0, 5.0] } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Prague", "Brno", "Ostrava", "Plzen"], "weights_kind": "uniform" } } }
+]
+},
+{
+"id": "store",
+"kind": "entity",
+"pk": "store_id",
+"columns": [
+{ "name": "store_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "company" } } },
+{ "name": "address", "type": "string", "nullable": false, "generator": { "faker": { "method": "address" } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Prague", "Brno", "Ostrava", "Plzen"] } } },
+{ "name": "store_type", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["grocery", "restaurant", "electronics", "convenience"], "weights_kind": "uniform" } } }
+]
+},
+{
+"id": "product",
+"kind": "entity",
+"pk": "product_id",
+"columns": [
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "name", "type": "string", "nullable": false, "generator": { "faker": { "method": "word" } } },
+{ "name": "category", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Electronics", "Groceries", "HotFood", "ColdDrinks", "IceCream", "Books", "Home"] } } },
+{ "name": "base_price", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 3.0, "sigma": 0.7 }, "clamp": [1.0, 2000.0] } } },
+{ "name": "shelf_life_days", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 30 }, "clamp": [1, 365] } } },
+{ "name": "is_active", "type": "bool", "nullable": false, "generator": { "choice": { "choices": [true, false], "weights": [0.95, 0.05] } } }
+]
+},
+{
+"id": "price_event",
+"kind": "fact",
+"pk": "event_id",
+"columns": [
+{ "name": "event_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "effective_ts", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "category", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Electronics", "Groceries"], "weights": [0.5, 0.5] } } },
+{ "name": "price_delta_pct", "type": "float", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": -0.2, "high": 0.2 }, "clamp": [-0.2, 0.2] } } },
+{ "name": "reason", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Supplier Increase", "Promo", "Seasonal"] } } }
+]
+},
+{
+"id": "weather_hourly",
+"kind": "fact",
+"pk": "weather_id",
+"columns": [
+{ "name": "weather_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["Prague", "Brno", "Ostrava", "Plzen"] } } },
+{ "name": "ts", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "temp_c", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 12.0, "std": 10.0 }, "clamp": [-30.0, 45.0] } } },
+{ "name": "precip_mm", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 0.0, "sigma": 1.0 }, "clamp": [0.0, 50.0] } } },
+{ "name": "condition", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["clear", "cloudy", "rain", "snow", "storm", "heatwave"], "weights": [0.45, 0.25, 0.18, 0.05, 0.04, 0.03] } } },
+{ "name": "demand_multiplier", "type": "float", "nullable": false, "generator": { "choice": { "choices": [1.00, 1.10, 1.20, 0.95, 1.25], "weights": [0.70, 0.15, 0.05, 0.05, 0.05] } } },
+{ "name": "delay_min", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 5.0 }, "clamp": [0, 60] } } }
+]
+},
+{
+"id": "order",
+"kind": "fact",
+"pk": "order_id",
+"parents": ["customer", "store"],
+"fanout": { "distribution": "poisson", "lambda": 8, "min": 0, "max": 50 },
+"columns": [
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "customer_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "customer.customer_id" } } },
+{ "name": "store_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "store.store_id" } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "lookup": { "from": "store.city", "on": { "this_key": "store_id" } } } },
+{ "name": "order_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [1.0, 1.0, 1.0, 1.0, 1.3, 1.2, 1.05] } } } },
+{ "name": "delivery_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } }, "modifiers": [ { "transform": "time_jitter", "args": { "std_minutes": 90 } } ] },
+{ "name": "promised_eta_min", "type": "int", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 40.0, "std": 10.0 }, "clamp": [10, 120] } } },
+{ "name": "delay_min", "type": "int", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 5.0, "std": 15.0 }, "clamp": [-10, 180] } } },
+{ "name": "total_amount", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 3.5, "sigma": 0.8 }, "clamp": [5.0, 500.0] } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "month", "weights": [0.90, 1.00, 1.05, 1.08, 1.12, 1.10, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00] } }, { "transform": "outliers", "args": { "rate": 0.01, "mode": "spike", "magnitude_dist": { "type": "lognormal", "params": { "mean": 0.0, "sigma": 0.5 } } } } ] },
+{ "name": "status", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["created", "shipped", "delivered", "cancelled"], "weights": [0.05, 0.10, 0.80, 0.05] } } },
+{ "name": "is_express", "type": "bool", "nullable": false, "generator": { "choice": { "choices": [true, false], "weights": [0.2, 0.8] } } },
+{ "name": "cancelled", "type": "bool", "nullable": false, "generator": { "choice": { "choices": [true, false], "weights": [0.05, 0.95] } } }
+]
+},
+{
+"id": "order_item",
+"kind": "fact",
+"pk": "order_item_id",
+"parents": ["order", "product"],
+"fanout": { "distribution": "poisson", "lambda": 5, "min": 1, "max": 30 },
+"columns": [
+{ "name": "order_item_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "order.order_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "product_name", "type": "string", "nullable": false, "generator": { "lookup": { "from": "product.name", "on": { "this_key": "product_id" } } } },
+{ "name": "category", "type": "string", "nullable": false, "generator": { "lookup": { "from": "product.category", "on": { "this_key": "product_id" } } } },
+{ "name": "quantity", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 2.5 }, "clamp": [1, 20] } }, "modifiers": [ { "transform": "seasonality", "args": { "dimension": "dow", "weights": [1.0, 1.0, 1.0, 1.0, 1.1, 1.15, 1.05] } } ] },
+{ "name": "list_price", "type": "float", "nullable": false, "generator": { "lookup": { "from": "product.base_price", "on": { "this_key": "product_id" } } } },
+{ "name": "promo_mult", "type": "float", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 0.80, "high": 1.00 }, "clamp": [0.80, 1.00] } } },
+{ "name": "unit_price", "type": "float", "nullable": false, "generator": { "expression": { "code": "list_price * promo_mult" } }, "modifiers": [ { "transform": "effect", "args": { "effect_table": "price_event", "on": { "category": "category" }, "window": { "start_col": "effective_ts", "end_col": "effective_ts" }, "map": { "field": "price_delta_pct", "op": "mul", "default": 1.0 } } }, { "transform": "clamp", "args": { "min": 0.10, "max": 100000.0 } } ] },
+{ "name": "total_price", "type": "float", "nullable": false, "generator": { "expression": { "code": "quantity * unit_price" } }, "modifiers": [ { "transform": "clamp", "args": { "min": 0.10, "max": 1000000.0 } } ] }
+]
+},
+{
+"id": "inventory_snapshot",
+"kind": "fact",
+"pk": "inv_id",
+"parents": ["store", "product"],
+"columns": [
+{ "name": "inv_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "store_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "store.store_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "date", "type": "date", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "on_hand", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 100 }, "clamp": [0, 1000000] } } },
+{ "name": "reorder_point", "type": "int", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 50, "std": 20 }, "clamp": [0, 10000] } } },
+{ "name": "lead_time_days", "type": "int", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 1, "high": 14 }, "clamp": [1, 14] } } }
+]
+},
+{
+"id": "stockout_event",
+"kind": "fact",
+"pk": "stockout_id",
+"parents": ["store", "product"],
+"columns": [
+{ "name": "stockout_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "store_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "store.store_id" } } },
+{ "name": "product_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "product.product_id" } } },
+{ "name": "ts", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "duration_min", "type": "int", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 10, "high": 240 }, "clamp": [10, 240] } } }
+]
+},
+{
+"id": "delivery",
+"kind": "fact",
+"pk": "delivery_id",
+"parents": ["order", "driver"],
+"fanout": { "distribution": "poisson", "lambda": 0.85, "min": 0, "max": 1 },
+"columns": [
+{ "name": "delivery_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "order.order_id" } } },
+{ "name": "driver_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "driver.driver_id" } } },
+{ "name": "pickup_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "delivery_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "distance_km", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 1.2, "sigma": 0.7 }, "clamp": [0.1, 50.0] } } },
+{ "name": "delivery_fee", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 4.0, "std": 2.0 }, "clamp": [0.0, 100.0] } } },
+{ "name": "weather_condition", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["clear", "cloudy", "rain", "snow", "storm", "heatwave"] } } },
+{ "name": "traffic_level", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 2.0 }, "clamp": [1, 5] } } },
+{ "name": "service_minutes", "type": "int", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 8.0, "std": 3.0 }, "clamp": [1, 60] } }, "modifiers": [ { "transform": "effect", "args": { "effect_table": "weather_hourly", "on": { "weather_condition": "condition" }, "window": { "start_col": "ts", "end_col": "ts" }, "map": { "field": "delay_min", "op": "add", "default": 0.0 } } } ] }
+]
+},
+{
+"id": "customer_satisfaction",
+"kind": "fact",
+"pk": "satisfaction_id",
+"parents": ["order", "customer"],
+"fanout": { "distribution": "poisson", "lambda": 0.6, "min": 0, "max": 1 },
+"columns": [
+{ "name": "satisfaction_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "order_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "order.order_id" } } },
+{ "name": "customer_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "customer.customer_id" } } },
+{ "name": "rating", "type": "int", "nullable": false, "generator": { "choice": { "choices": [1, 2, 3, 4, 5], "weights": [0.05, 0.10, 0.20, 0.35, 0.30] } } },
+{ "name": "food_quality_rating", "type": "int", "nullable": false, "generator": { "choice": { "choices": [1, 2, 3, 4, 5], "weights": [0.05, 0.10, 0.20, 0.35, 0.30] } } },
+{ "name": "delivery_rating", "type": "int", "nullable": false, "generator": { "choice": { "choices": [1, 2, 3, 4, 5], "weights": [0.05, 0.10, 0.20, 0.35, 0.30] } } },
+{ "name": "comment", "type": "string", "nullable": true, "generator": { "choice": { "choices": ["", "Great!", "Okay", "Late delivery", "Cold food"], "weights": [0.60, 0.15, 0.10, 0.10, 0.05] } } },
+{ "name": "survey_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } }
+]
+},
+{
+"id": "driver_shift",
+"kind": "fact",
+"pk": "shift_id",
+"parents": ["driver"],
+"fanout": { "distribution": "poisson", "lambda": 60, "min": 20, "max": 100 },
+"columns": [
+{ "name": "shift_id", "type": "int", "nullable": false, "generator": { "sequence": { "start": 1, "step": 1 } } },
+{ "name": "driver_id", "type": "int", "nullable": false, "generator": { "lookup": { "from": "driver.driver_id" } } },
+{ "name": "city", "type": "string", "nullable": false, "generator": { "lookup": { "from": "driver.city", "on": { "this_key": "driver_id" } } } },
+{ "name": "shift_date", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "D" } } },
+{ "name": "start_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "end_time", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H" } } },
+{ "name": "hours_worked", "type": "float", "nullable": false, "generator": { "distribution": { "type": "normal", "params": { "mean": 8.0, "std": 1.0 }, "clamp": [3.0, 12.0] } } },
+{ "name": "deliveries_completed", "type": "int", "nullable": false, "generator": { "distribution": { "type": "poisson", "params": { "lambda": 12.0 }, "clamp": [0, 50] } } },
+{ "name": "total_distance_km", "type": "float", "nullable": false, "generator": { "distribution": { "type": "lognormal", "params": { "mean": 2.5, "sigma": 0.7 }, "clamp": [0.0, 400.0] } } },
+{ "name": "on_time_ratio", "type": "float", "nullable": false, "generator": { "distribution": { "type": "uniform", "params": { "low": 0.70, "high": 1.00 }, "clamp": [0.70, 1.00] } } }
+]
+}
+],
+"constraints": {
+"unique": [
+"customer.customer_id",
+"driver.driver_id",
+"store.store_id",
+"product.product_id",
+"order.order_id",
+"order_item.order_item_id",
+"delivery.delivery_id",
+"customer_satisfaction.satisfaction_id",
+"driver_shift.shift_id",
+"inventory_snapshot.inv_id",
+"price_event.event_id",
+"weather_hourly.weather_id",
+"stockout_event.stockout_id"
+],
+"foreign_keys": [
+{ "from": "order.customer_id", "to": "customer.customer_id" },
+{ "from": "order.store_id", "to": "store.store_id" },
+{ "from": "order.city", "to": "store.city" },
+{ "from": "order_item.order_id", "to": "order.order_id" },
+{ "from": "order_item.product_id", "to": "product.product_id" },
+{ "from": "delivery.order_id", "to": "order.order_id" },
+{ "from": "delivery.driver_id", "to": "driver.driver_id" },
+{ "from": "inventory_snapshot.store_id", "to": "store.store_id" },
+{ "from": "inventory_snapshot.product_id", "to": "product.product_id" },
+{ "from": "stockout_event.store_id", "to": "store.store_id" },
+{ "from": "stockout_event.product_id", "to": "product.product_id" },
+{ "from": "customer_satisfaction.order_id", "to": "order.order_id" },
+{ "from": "customer_satisfaction.customer_id", "to": "customer.customer_id" },
+{ "from": "driver_shift.driver_id", "to": "driver.driver_id" },
+{ "from": "driver_shift.city", "to": "driver.city" }
+],
+"ranges": [
+{ "attr": "order_item.quantity", "min": 1, "max": 20 },
+{ "attr": "order_item.unit_price", "min": 0.10, "max": 100000.0 },
+{ "attr": "order.total_amount", "min": 5.0, "max": 500.0 },
+{ "attr": "delivery.traffic_level", "min": 1, "max": 5 },
+{ "attr": "customer_satisfaction.rating", "min": 1, "max": 5 },
+{ "attr": "customer_satisfaction.food_quality_rating", "min": 1, "max": 5 },
+{ "attr": "customer_satisfaction.delivery_rating", "min": 1, "max": 5 },
+{ "attr": "inventory_snapshot.on_hand", "min": 0, "max": 1000000 }
+],
+"inequalities": [
+{ "left": "order.order_date", "op": "<", "right": "delivery.delivery_time" },
+{ "left": "delivery.pickup_time", "op": "<=", "right": "delivery.delivery_time" },
+{ "left": "driver_shift.start_time", "op": "<", "right": "driver_shift.end_time" }
+]
+},
+"targets": {
+"weekend_share": { "table": "order", "timestamp": "order_date", "min": 0.30, "max": 0.45 },
+"mean_in_range": { "table": "driver_shift", "column": "on_time_ratio", "min": 0.82, "max": 1.00 }
+},
+"dag": [
+["customer", "driver", "store", "product"],
+["price_event", "weather_hourly"],
+["order"],
+["order_item"],
+["inventory_snapshot"],
+["stockout_event", "delivery"],
+["customer_satisfaction", "driver_shift"]
+]
+}
