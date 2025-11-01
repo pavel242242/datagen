@@ -179,7 +179,7 @@ Transform generated data for realism:
 - `jitter`, `time_jitter` - Add realistic noise
 - `seasonality` - Time-based patterns (hour/day/month)
 - `outliers` - Inject spikes or drops
-- `expression` - Complex derived values
+- `map_values` - Categorical remapping
 
 ### ✅ Comprehensive Validation
 
@@ -286,7 +286,7 @@ datagen generate <schema.json> [OPTIONS]
 
 # Validate dataset
 datagen validate <schema.json> [OPTIONS]
-  --data PATH         Path to generated data directory
+  -d, --data-dir PATH Directory with generated Parquet files
   --output PATH       JSON report output path
 
 # Create schema from natural language (requires LLM)
@@ -304,13 +304,23 @@ datagen generate --help
 
 ### Custom Row Counts
 
-Entity row counts default to 1000. To customize, edit `src/datagen/core/executor.py:71`:
+Entity row counts default to 1000. You can configure this per entity in your schema using the `rows` field:
 
-```python
-n_rows = 5000  # Change from default 1000
+```json
+{
+  "id": "user",
+  "kind": "entity",
+  "rows": 5000,
+  "pk": "user_id",
+  "columns": [...]
+}
 ```
 
-*Future versions will support `row_count` in schema DSL.*
+Alternatively, you can change the default by editing `src/datagen/core/executor.py:85`:
+
+```python
+n_rows = node.rows if node.rows is not None else 5000  # Change default from 1000
+```
 
 ### Locale-Aware Generation
 
@@ -346,12 +356,14 @@ datagen generate schema.json --output-dir ./output
 
 **CSV:**
 ```bash
-# Use the export utility
-python -c "
-from datagen.core.output import export_to_csv
-export_to_csv('output/', 'output_csv/')
-"
+# Export to CSV with Keboola-compatible metadata
+datagen export schema.json --data-dir ./output -o ./output_csv --format csv
 ```
+
+This generates:
+- CSV files for each table
+- `*.csv.manifest` files with Keboola-compatible metadata
+- `dataset.json` with enhanced metadata
 
 ### Keboola Integration
 
@@ -540,20 +552,21 @@ Tested on MacBook Pro M1 (16GB RAM):
 
 - [x] Schema layer with Pydantic validation
 - [x] DAG inference and topological sort
-- [x] All core generators (sequence, choice, distribution, faker, lookup, datetime)
-- [x] Modifiers (jitter, seasonality, outliers, expression)
+- [x] All core generators (sequence, choice, distribution, faker, lookup, datetime, expression)
+- [x] Modifiers (multiply, add, clamp, jitter, time_jitter, seasonality, outliers, map_values)
 - [x] Deterministic seeding
 - [x] Parquet output with metadata
 - [x] Comprehensive validation with quality scoring
 - [x] FK integrity and self-referential support
 - [x] CLI with rich output
+- [x] Configurable row counts per entity (via `rows` field in schema)
+- [x] CSV export with Keboola-compatible metadata
 
 ### 🚧 In Progress
 
 - [ ] LLM integration (natural language → schema)
-- [ ] Configurable row counts per entity
-- [ ] CSV/JSON export formats
 - [ ] HTML validation reports
+- [ ] JSON export format
 
 ### 🔮 Future (v1.1+)
 
@@ -606,8 +619,8 @@ pip install -e . --force-reinstall
 
 **Faker locale not found:**
 ```bash
-# Check locale mapping in src/datagen/utils/locale_mapping.py
-# Add custom mappings if needed
+# Check locale mapping in src/datagen/core/generators/semantic.py (lines 12-41)
+# Add custom country->locale mappings as needed
 ```
 
 **Validation fails with "File not found":**
@@ -620,7 +633,7 @@ datagen validate schema.json --data ./output
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License (LICENSE file to be added)
 
 ---
 
@@ -640,7 +653,7 @@ Built with:
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/pavel242242/datagen/issues)
-- **Documentation**: See `docs/` folder and `datagen_spec.md`
+- **Documentation**: See `datagen_spec.md`, `STATUS.md`, and `CLAUDE.md`
 - **Examples**: See `example/` folder for working schemas
 
 ---

@@ -74,12 +74,18 @@ JSON Schema → Schema Validation (Pydantic) → DAG Builder (NetworkX)
 **Example:**
 ```python
 class Column(BaseModel):
+    """Column definition."""
     name: str
-    type: Literal["int", "float", "string", "date", "datetime", "bool"]
+    type: Literal["int", "float", "string", "bool", "datetime", "date"]
     nullable: bool = False
-    generator: GeneratorSpec
-    modifiers: List[ModifierSpec] = Field(default_factory=list)
+    generator: dict  # Validated as one of the generator spec types
+    modifiers: Optional[list[ModifierSpec]] = None
+    constraints: Optional[dict] = None
+
+    # Field validators handle generator spec validation (lines 259-294 in schema.py)
 ```
+
+**Note:** The `generator` field is defined as `dict` and validated via field validators rather than using Pydantic discriminated unions directly.
 
 #### 2. DAG Builder (`src/datagen/core/dag.py`)
 
@@ -118,65 +124,107 @@ levels = [
 
 **Purpose:** Deterministic seed derivation for reproducibility
 
-**Key Function:** `derive_seed(master_seed: int, *parts: str) -> np.random.Generator`
+**Key Functions:**
+- `derive_seed(*parts: Union[str, int, float]) -> int` - Hash parts to integer seed
+- `get_rng(*parts: Union[str, int, float]) -> np.random.Generator` - Get RNG from seed
+- `SeedManager` class - Convenience wrapper with scoped RNG methods
 
-**Algorithm:**
-1. Concatenate master seed + parts (table name, column name, parent ID, etc.)
+**Algorithm (derive_seed):**
+1. Concatenate all parts (can be str, int, or float)
 2. Hash with SHA256
-3. Take first 8 bytes as integer seed
-4. Return `np.random.Generator(np.random.PCG64(seed))`
+3. Take first 4 bytes as integer seed
+4. Return integer seed
+
+**Algorithm (get_rng):**
+1. Call `derive_seed(*parts)` to get integer seed
+2. Return `np.random.default_rng(seed)`
+
+**SeedManager Class:**
+Provides scoped RNG generators:
+```python
+class SeedManager:
+    def __init__(self, master_seed: int):
+        self.master_seed = master_seed
+
+    def node_rng(self, node_id: str) -> np.random.Generator
+    def column_rng(self, node_id: str, col_name: str) -> np.random.Generator
+    def parent_rng(self, node_id: str, parent_id: str) -> np.random.Generator
+    def row_rng(self, node_id: str, row_idx: int) -> np.random.Generator
+```
 
 **Important Details:**
-- Same inputs ALWAYS produce same Generator
-- Different parts (table, column) produce uncorrelated seeds
-- Uses modern PCG64 algorithm (better than MT19937)
+- Same inputs ALWAYS produce same seed/Generator
+- Different parts produce uncorrelated seeds
+- Uses `np.random.default_rng()` (modern PRNG)
+- Takes first **4 bytes** of hash, not 8
 - Critical for deterministic generation
 
 **When to Edit:**
 - Changing hash algorithm (requires migration plan)
-- Adding seed scopes (e.g., per-row seeds)
+- Adding seed scopes (use SeedManager class)
 
 **Example:**
 ```python
-# Different seeds for different contexts
-user_seed = derive_seed(42, "user")
-age_seed = derive_seed(42, "user", "age")
-email_seed = derive_seed(42, "user", "email")
+# Using derive_seed directly
+user_seed = derive_seed(42, "user")  # Returns int
+age_rng = get_rng(42, "user", "age")  # Returns Generator
+
+# Using SeedManager (recommended)
+sm = SeedManager(master_seed=42)
+user_rng = sm.node_rng("user")
+age_rng = sm.column_rng("user", "age")
 ```
 
 #### 4. Generator Registry (`src/datagen/core/generators/registry.py`)
 
-**Purpose:** Pluggable function registry for all generators
+**Purpose:** Class-based registry for dispatching generator functions
 
-**Key Structure:**
+**Key Classes:**
+- `LookupResolver` - Handles FK lookups and cross-table references
+- `GeneratorRegistry` - Main registry class that dispatches to appropriate generators
+
+**GeneratorRegistry Structure:**
 ```python
-REGISTRY = {
-    "sequence": generate_sequence,
-    "choice": generate_choice,
-    "distribution": generate_distribution,
-    "datetime_series": generate_datetime_series,
-    "faker": generate_faker,
-    "lookup": generate_lookup,
-    "expression": generate_expression,
-}
+class GeneratorRegistry:
+    def __init__(self, tables: Dict[str, pd.DataFrame]):
+        self.tables = tables
+        self.lookup_resolver = LookupResolver(tables)
+
+    def generate(
+        self,
+        spec: dict,              # Generator spec from schema
+        n_rows: int,            # Number of values to generate
+        rng: np.random.Generator,  # Seeded RNG
+        timeframe: Optional[Timeframe] = None
+    ) -> pd.Series | np.ndarray:
+        """Dispatch to appropriate generator based on spec type."""
+        # Extracts generator type from spec dict
+        # Calls corresponding generator function
+        # Returns generated values
 ```
 
-**Generator Function Signature:**
-```python
-def generate_X(
-    spec: XSpec,           # Pydantic spec from schema
-    n_rows: int,           # Number of values to generate
-    rng: np.random.Generator,  # Seeded RNG
-    context: GenerationContext  # Access to parent tables, timeframe, etc.
-) -> np.ndarray | pd.Series:
-    ...
-```
+**Supported Generator Types:**
+- `sequence` - Sequential integers
+- `choice` - Random selection (uniform/weighted/Zipf/head-tail)
+- `distribution` - Statistical distributions (normal, lognormal, uniform, poisson)
+- `datetime_series` - Time series with patterns
+- `faker` - Realistic fake data via Faker library
+- `lookup` - Foreign key references (delegated to LookupResolver)
+- `expression` - Computed values from expressions
+- `enum_list` - Enumeration values
 
 **Important Details:**
+- Registry is instantiated with already-generated tables for lookups
+- Generators are called based on spec dict structure, not a global REGISTRY dict
 - All generators must be vectorized (generate all rows at once)
 - Return numpy array or pandas Series
 - Use provided RNG for all randomness (never `random.random()`)
-- Access parent data via `context.tables[table_name]`
+- Access parent data via `self.tables[table_name]` in registry
+
+**LookupResolver Class:**
+Handles two lookup modes:
+1. **Random lookup**: `{"from": "table.column"}` - randomly sample from referenced table
+2. **Join-based lookup**: `{"from": "table.column", "on": "local_col"}` - join on matching values
 
 **Generator Implementations:**
 
@@ -279,7 +327,8 @@ amount = apply_modifiers(amount, modifiers, context)
 6. Write metadata JSON
 
 **Important Details:**
-- Entity row count hardcoded at line 71: `n_rows = 1000`
+- Entity row count at line 85: `n_rows = node.rows if node.rows is not None else 1000`
+- Row count is configurable via `node.rows` field in schema, defaults to 1000
 - Fact row count determined by parent fanout (Poisson/uniform)
 - FK columns use `lookup` generator with parent table reference
 - Self-referential FKs allow some null values to break cycles
