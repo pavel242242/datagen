@@ -9,8 +9,10 @@ from datetime import datetime
 # Generator Specs
 # ============================================================================
 
+
 class SequenceGenerator(BaseModel):
     """Sequential integer generator."""
+
     sequence: dict = Field(default_factory=lambda: {"start": 1, "step": 1})
 
     @field_validator("sequence")
@@ -29,6 +31,7 @@ class SequenceGenerator(BaseModel):
 
 class ChoiceGenerator(BaseModel):
     """Choice from list generator."""
+
     choice: dict
 
     @field_validator("choice")
@@ -60,20 +63,24 @@ class ChoiceGenerator(BaseModel):
                     alpha = float(alpha_str)
                     if alpha <= 0:
                         raise ValueError(f"zipf alpha must be positive, got: {alpha}")
-                except (IndexError, ValueError) as e:
-                    raise ValueError(f"Invalid zipf weights_kind format: {wk}. Expected 'zipf@<positive_float>', e.g., 'zipf@1.5'")
+                except (IndexError, ValueError):
+                    raise ValueError(
+                        f"Invalid zipf weights_kind format: {wk}. Expected 'zipf@<positive_float>', e.g., 'zipf@1.5'"
+                    )
             elif wk.startswith("head_tail@"):
                 # Validate head_tail@{head_share,tail_alpha} - both must be floats
                 try:
                     params_str = wk.split("@", 1)[1]
                     if not (params_str.startswith("{") and params_str.endswith("}")):
-                        raise ValueError(f"head_tail parameters must be in {{}} braces")
+                        raise ValueError("head_tail parameters must be in {} braces")
 
                     params_str = params_str[1:-1]  # Remove braces
                     parts = [p.strip() for p in params_str.split(",")]
 
                     if len(parts) != 2:
-                        raise ValueError(f"head_tail requires exactly 2 parameters, got {len(parts)}")
+                        raise ValueError(
+                            f"head_tail requires exactly 2 parameters, got {len(parts)}"
+                        )
 
                     head_share = float(parts[0])
                     tail_alpha = float(parts[1])
@@ -97,6 +104,7 @@ class ChoiceGenerator(BaseModel):
 
 class DistributionGenerator(BaseModel):
     """Statistical distribution generator."""
+
     distribution: dict
 
     @field_validator("distribution")
@@ -121,6 +129,7 @@ class DistributionGenerator(BaseModel):
 
 class DatetimeSeriesGenerator(BaseModel):
     """Datetime series generator with optional patterns."""
+
     datetime_series: dict
 
     @field_validator("datetime_series")
@@ -146,13 +155,16 @@ class DatetimeSeriesGenerator(BaseModel):
             weights = pattern["weights"]
             expected_len = {"hour": 24, "dow": 7, "month": 12}[pattern["dimension"]]
             if len(weights) != expected_len:
-                raise ValueError(f"weights for {pattern['dimension']} must have {expected_len} values")
+                raise ValueError(
+                    f"weights for {pattern['dimension']} must have {expected_len} values"
+                )
 
         return v
 
 
 class FakerGenerator(BaseModel):
     """Faker semantic data generator."""
+
     faker: dict
 
     @field_validator("faker")
@@ -165,6 +177,7 @@ class FakerGenerator(BaseModel):
 
 class LookupGenerator(BaseModel):
     """Lookup/foreign key generator."""
+
     lookup: dict
 
     @field_validator("lookup")
@@ -182,6 +195,7 @@ class LookupGenerator(BaseModel):
 
 class ExpressionGenerator(BaseModel):
     """Expression-based generator."""
+
     expression: dict
 
     @field_validator("expression")
@@ -194,6 +208,7 @@ class ExpressionGenerator(BaseModel):
 
 class EnumListGenerator(BaseModel):
     """Enum list generator (for vocab nodes)."""
+
     enum_list: dict
 
     @field_validator("enum_list")
@@ -223,11 +238,21 @@ GeneratorSpec = Union[
 # Modifier Specs
 # ============================================================================
 
+
 class ModifierSpec(BaseModel):
     """Generic modifier specification."""
+
     transform: Literal[
-        "multiply", "add", "clamp", "jitter", "map_values",
-        "seasonality", "time_jitter", "effect", "outliers", "trend"
+        "multiply",
+        "add",
+        "clamp",
+        "jitter",
+        "map_values",
+        "seasonality",
+        "time_jitter",
+        "effect",
+        "outliers",
+        "trend",
     ]
     args: dict
 
@@ -236,8 +261,10 @@ class ModifierSpec(BaseModel):
 # Column & Node
 # ============================================================================
 
+
 class Fanout(BaseModel):
     """Fanout specification for fact tables."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     distribution: Literal["poisson", "uniform"]
@@ -249,6 +276,7 @@ class Fanout(BaseModel):
 
 class Column(BaseModel):
     """Column definition."""
+
     name: str
     type: Literal["int", "float", "string", "bool", "datetime", "date"]
     nullable: bool = False
@@ -261,8 +289,14 @@ class Column(BaseModel):
     def validate_generator(cls, v):
         # Check that exactly one generator key exists
         valid_keys = {
-            "sequence", "choice", "distribution", "datetime_series",
-            "faker", "lookup", "expression", "enum_list"
+            "sequence",
+            "choice",
+            "distribution",
+            "datetime_series",
+            "faker",
+            "lookup",
+            "expression",
+            "enum_list",
         }
         gen_keys = set(v.keys()) & valid_keys
 
@@ -296,6 +330,7 @@ class Column(BaseModel):
 
 class Node(BaseModel):
     """Entity, fact, or vocab table definition."""
+
     id: str
     kind: Literal["entity", "fact", "vocab"]
     pk: str
@@ -305,6 +340,7 @@ class Node(BaseModel):
     modifiers: Optional[list[ModifierSpec]] = None  # Table-level modifiers (e.g., effects)
     rows: Optional[int] = None  # For entities: override default row count
     segment_behavior: Optional[dict] = None  # Behavioral segmentation config
+    vintage_behavior: Optional[dict] = None  # Age-based behavior config (Feature #1)
 
     @model_validator(mode="after")
     def validate_node(self):
@@ -340,8 +376,10 @@ class Node(BaseModel):
 # Constraints
 # ============================================================================
 
+
 class ForeignKey(BaseModel):
     """Foreign key constraint."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     from_: str = Field(..., alias="from")
@@ -357,6 +395,7 @@ class ForeignKey(BaseModel):
 
 class RangeConstraint(BaseModel):
     """Range constraint for numeric columns."""
+
     attr: str
     min: Optional[float] = None
     max: Optional[float] = None
@@ -371,6 +410,7 @@ class RangeConstraint(BaseModel):
 
 class InequalityConstraint(BaseModel):
     """Inequality constraint between columns."""
+
     left: str
     op: Literal["<", "<=", ">", ">=", "=="]
     right: str
@@ -378,12 +418,14 @@ class InequalityConstraint(BaseModel):
 
 class PatternConstraint(BaseModel):
     """Regex pattern constraint."""
+
     attr: str
     regex: str
 
 
 class EnumConstraint(BaseModel):
     """Enum membership constraint."""
+
     attr: str
     values: Optional[list[Any]] = None
     enum_ref: Optional[str] = None
@@ -391,6 +433,7 @@ class EnumConstraint(BaseModel):
 
 class Constraints(BaseModel):
     """All constraint definitions."""
+
     unique: Optional[list[str]] = None
     foreign_keys: Optional[list[ForeignKey]] = None
     ranges: Optional[list[RangeConstraint]] = None
@@ -403,8 +446,10 @@ class Constraints(BaseModel):
 # Targets
 # ============================================================================
 
+
 class WeekendShareTarget(BaseModel):
     """Weekend share target validation."""
+
     table: str
     timestamp: str
     min: float
@@ -413,6 +458,7 @@ class WeekendShareTarget(BaseModel):
 
 class MeanInRangeTarget(BaseModel):
     """Mean value range target."""
+
     table: str
     column: str
     min: float
@@ -421,6 +467,7 @@ class MeanInRangeTarget(BaseModel):
 
 class CompositeEffectInfluence(BaseModel):
     """Single influence in composite effect."""
+
     kind: Literal["seasonality", "effect", "outliers"]
     # Fields depend on kind, keep flexible for now
     dimension: Optional[str] = None
@@ -435,6 +482,7 @@ class CompositeEffectInfluence(BaseModel):
 
 class CompositeEffectTarget(BaseModel):
     """Composite effect validation."""
+
     table: str
     metric: str
     influences: list[CompositeEffectInfluence]
@@ -443,6 +491,7 @@ class CompositeEffectTarget(BaseModel):
 
 class Targets(BaseModel):
     """Quality targets for validation."""
+
     weekend_share: Optional[WeekendShareTarget] = None
     mean_in_range: Optional[MeanInRangeTarget] = None
     composite_effect: Optional[CompositeEffectTarget] = None
@@ -452,11 +501,13 @@ class Targets(BaseModel):
 # Timeframe
 # ============================================================================
 
+
 class Timeframe(BaseModel):
     """Timeframe definition."""
+
     start: str  # ISO8601
-    end: str    # ISO8601
-    freq: str   # pandas offset alias
+    end: str  # ISO8601
+    freq: str  # pandas offset alias
 
     @field_validator("start", "end")
     @classmethod
@@ -472,13 +523,16 @@ class Timeframe(BaseModel):
 # Top-Level Schema
 # ============================================================================
 
+
 class Metadata(BaseModel):
     """Schema metadata."""
+
     name: str
 
 
 class Dataset(BaseModel):
     """Top-level Datagen schema."""
+
     model_config = ConfigDict(extra="forbid")  # Reject unknown fields
 
     version: str
@@ -524,6 +578,7 @@ class Dataset(BaseModel):
 # Validation Helper
 # ============================================================================
 
+
 def validate_schema(schema_dict: dict) -> Dataset:
     """
     Validate a schema dictionary against the Datagen DSL.
@@ -546,6 +601,7 @@ def validate_schema(schema_dict: dict) -> Dataset:
 
     # Step 2: Preflight validation to catch runtime errors
     from .preflight import preflight_validate
+
     preflight_validate(dataset)
 
     return dataset

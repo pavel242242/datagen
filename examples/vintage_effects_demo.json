@@ -1,0 +1,167 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "VintageEffectsDemo",
+    "description": "Demonstrates Feature #1: Entity Vintage Effects for cohort retention analysis"
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "nodes": [
+    {
+      "id": "customer",
+      "kind": "entity",
+      "pk": "customer_id",
+      "rows": 500,
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {
+            "sequence": {
+              "start": 1,
+              "step": 1
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "generator": {
+            "faker": {
+              "method": "name"
+            }
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {
+            "faker": {
+              "method": "email"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        }
+      ],
+      "vintage_behavior": {
+        "created_at_column": "created_at",
+        "age_based_multipliers": {
+          "activity_decay": {
+            "curve": [1.0, 0.75, 0.60, 0.50, 0.45, 0.40, 0.35, 0.30, 0.25, 0.22, 0.20, 0.18],
+            "time_unit": "month",
+            "applies_to": "fanout",
+            "comment": "Customers become less active over time - retention decay"
+          },
+          "value_growth": {
+            "curve": {
+              "curve_type": "logarithmic",
+              "params": {
+                "a": 1.0,
+                "b": 0.15
+              }
+            },
+            "time_unit": "month",
+            "applies_to": ["amount"],
+            "comment": "Customer lifetime value grows logarithmically - mature customers spend more per transaction"
+          }
+        }
+      }
+    },
+    {
+      "id": "purchase",
+      "kind": "fact",
+      "pk": "purchase_id",
+      "parents": ["customer"],
+      "fanout": {
+        "distribution": "poisson",
+        "lambda": 12
+      },
+      "columns": [
+        {
+          "name": "purchase_id",
+          "type": "int",
+          "generator": {
+            "sequence": {
+              "start": 1,
+              "step": 1
+            }
+          }
+        },
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {
+            "lookup": {
+              "from": "customer.customer_id"
+            }
+          }
+        },
+        {
+          "name": "purchase_time",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {
+                "mean": 3.5,
+                "sigma": 0.5
+              },
+              "clamp": [10.0, 500.0]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "primary_keys": [
+      {
+        "table": "customer",
+        "column": "customer_id"
+      },
+      {
+        "table": "purchase",
+        "column": "purchase_id"
+      }
+    ],
+    "foreign_keys": [
+      {
+        "table": "purchase",
+        "column": "customer_id",
+        "references": {
+          "table": "customer",
+          "column": "customer_id"
+        }
+      }
+    ]
+  },
+  "targets": null
+}
