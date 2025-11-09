@@ -17,11 +17,11 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| **Test Pass Rate** | 69/69 (100%) | 100% | ✅ |
+| **Test Pass Rate** | 95/95 (100%) | 100% | ✅ |
 | **Test Coverage** | 43% | 75% | ⚠️ In Progress |
 | **Quality Score** | 95.4/100 (bank schema) | 95+ | ✅ |
 | **Performance** | 500K rows in ~10s | 1M rows in <20s | ✅ |
-| **Feature Completeness** | Phase 4: 2/3 CRITICAL | Phase 4: 3/3 | 🚧 |
+| **Feature Completeness** | Phase 4: 3/3 CRITICAL | Phase 4: 3/3 | ✅ Complete! |
 | **LLM Integration** | Planned | Production-ready | 📋 Phase 5 |
 
 ---
@@ -40,13 +40,13 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 - Capability: Behavioral clusters with segment-specific multipliers
 - Validation: VIP segment shows 22 orders/customer vs Standard 21.6
 
-### 🎯 Next Priority: Feature #1 - Entity Vintage Effects
+### ✅ Recently Completed: Feature #1 - Entity Vintage Effects (2025-11-09)
 
-**Status**: Not started, ready to begin
-**Effort**: 12-16 hours (complex, affects core generation logic)
-**Impact**: CRITICAL - Unblocks cohort retention analysis, LTV, churn measurement
+**Status**: ✅ Implemented & Committed
+**Effort**: ~8 hours (completed faster than estimated 12-16h)
+**Impact**: CRITICAL - Enables cohort retention analysis, LTV, churn measurement
 
-**Current Problem**: "All users signed up at once - can't measure true churn or cohort retention" (from analyst blind analysis)
+**Problem Solved**: "All users signed up at once - can't measure true churn or cohort retention"
 
 **What It Enables**:
 - Cohort-based retention analysis
@@ -55,11 +55,14 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 - Age-based activity decay curves
 - Vintage analysis across any entity type
 
-**Implementation Areas**:
-- `src/datagen/core/schema.py` - Add vintage_behavior to Node model
-- `src/datagen/core/executor.py` - Calculate entity age, apply multipliers
-- `src/datagen/core/generators/primitives.py` - Fanout modifier support
-- `tests/test_vintage_effects.py` - New test suite
+**Implementation Complete**:
+- ✅ `src/datagen/core/vintage_utils.py` - 300 lines (age calc, curve evaluation)
+- ✅ `src/datagen/core/schema.py` - vintage_behavior field added
+- ✅ `src/datagen/core/executor.py` - Age multipliers integrated
+- ✅ `tests/test_vintage_effects.py` - 26 comprehensive tests (all passing)
+- ✅ `examples/vintage_effects_demo.json` - Demo schema
+
+**Next**: Blind validation to verify cohort retention visible to analysts
 
 ---
 

@@ -183,10 +183,10 @@
 
 ---
 
-#### 🎯 Feature #1: Entity Vintage Effects (NEXT PRIORITY)
-**Status**: 📋 Not Started (Critical Path)
-**Effort**: 12-16 hours
-**Priority**: HIGHEST (blocks Phase 4 completion)
+#### ✅ Feature #1: Entity Vintage Effects (SHIPPED 2025-11-09)
+**Status**: ✅ Implemented & Testing
+**Effort**: ~8 hours (completed faster than estimated)
+**Priority**: CRITICAL (Phase 4 completion)
 **Complexity**: High (affects core generation logic)
 
 **Problem**: "All users signed up at once - can't measure true churn or cohort retention" (Head of Data blind analysis)
@@ -237,16 +237,16 @@
 7. Validate with blind analysis (cohort retention visible)
 
 **Acceptance Criteria**:
-- [ ] Schema support for vintage_behavior configuration
-- [ ] Entity created_at timestamps properly generated
-- [ ] Age calculation during fact generation
-- [ ] Activity decay curves applied to fanout
-- [ ] Value growth curves applied to columns
-- [ ] Array-based curves supported
-- [ ] Parametric curves (log, exp, linear) supported
-- [ ] Tests confirm age-based differentiation
-- [ ] Blind analysis confirms cohort retention visible
-- [ ] Analyst can say "retention drops X% after Y months"
+- [x] Schema support for vintage_behavior configuration
+- [x] Entity created_at timestamps properly generated
+- [x] Age calculation during fact generation
+- [x] Activity decay curves applied to fanout
+- [x] Value growth curves applied to columns
+- [x] Array-based curves supported
+- [x] Parametric curves (log, exp, linear) supported
+- [x] Tests confirm age-based differentiation (26 tests passing)
+- [ ] Blind analysis confirms cohort retention visible (NEXT)
+- [ ] Analyst can say "retention drops X% after Y months" (NEXT)
 
 **Files to Modify**:
 - `src/datagen/core/schema.py` - VintageBehavior Pydantic model
