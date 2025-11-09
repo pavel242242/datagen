@@ -227,7 +227,7 @@ class ModifierSpec(BaseModel):
     """Generic modifier specification."""
     transform: Literal[
         "multiply", "add", "clamp", "jitter", "map_values",
-        "seasonality", "time_jitter", "effect", "outliers"
+        "seasonality", "time_jitter", "effect", "outliers", "trend"
     ]
     args: dict
 
