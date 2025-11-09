@@ -1,0 +1,21 @@
+product_id,product_name,product_type,tier,launch_date
+100,VS Code Extension,platform,pro,2023-04-30
+101,Testing Framework,platform,free,2023-07-31
+102,GitHub Integration,cli,free,2024-06-30
+103,Data Pipeline,mcp,free,2023-06-30
+104,Web Platform,api,enterprise,2023-03-31
+105,Slack Bot,integration,free,2024-01-31
+106,Security Scanner,integration,enterprise,2023-08-31
+107,Web Platform,platform,free,2023-09-30
+108,Secret Manager,api,free,2024-12-31
+109,MCP Server,platform,free,2024-01-31
+110,CI/CD Plugin,api,pro,2024-04-30
+111,VS Code Extension,platform,pro,2024-05-31
+112,Slack Bot,platform,enterprise,2024-02-29
+113,Analytics Engine,api,pro,2023-07-31
+114,CLI Tool,platform,free,2023-03-31
+115,MCP Server,cli,pro,2023-08-31
+116,Security Scanner,plugin,pro,2023-05-31
+117,Load Balancer,mcp,free,2024-06-30
+118,MCP Server,integration,free,2023-01-31
+119,Documentation Generator,plugin,free,2024-09-30

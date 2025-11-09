@@ -1,0 +1,201 @@
+company_id,company_name,industry,company_size,country,is_customer,signed_date,mrr_usd
+5000,"Wilson, Mcfarland and Smith",ecommerce,11-50,GB,False,2024-05-24,6088
+5001,"Martin, White and Lopez",technology,11-50,US,False,2024-02-18,25973
+5002,Myers-Meyers,finance,11-50,AU,False,2024-05-20,5468
+5003,Jones LLC,technology,1-10,CA,True,2024-11-15,1078
+5004,Carr-Friedman,technology,51-200,IN,False,2024-05-24,8424
+5005,"Scott, Luna and Davidson",healthcare,1-10,CA,False,2024-11-11,2072
+5006,"Arnold, Hill and Zamora",healthcare,1-10,BR,True,2024-05-03,678
+5007,Smith Group,finance,11-50,US,False,2024-10-31,1392
+5008,Thompson-Martinez,technology,11-50,GB,True,2024-01-26,337
+5009,Ortiz-Reese,education,1-10,US,True,2024-01-31,5055
+5010,Robbins Group,education,1-10,DE,False,2024-01-12,50000
+5011,Fox-Jones,finance,11-50,US,False,2024-12-23,10514
+5012,"Edwards, Johnson and Foster",technology,1-10,GB,True,2024-03-26,3598
+5013,"Walker, Morris and Scott",technology,201-500,BR,False,2024-09-10,2225
+5014,Velez-Ferrell,technology,11-50,US,False,2024-05-17,11023
+5015,Dillon-Payne,ecommerce,201-500,FR,False,2024-10-07,2063
+5016,Wade-Wilkins,healthcare,1-10,FR,True,2024-01-20,1301
+5017,Haley PLC,ecommerce,1-10,GB,False,2024-04-05,7490
+5018,"Esparza, Alexander and Miller",technology,1-10,DE,False,2024-05-18,4829
+5019,"Stephens, Roman and Oliver",healthcare,501-1000,US,True,2024-08-12,10770
+5020,"Jones, Murphy and Thornton",technology,51-200,IN,False,2024-09-06,1226
+5021,Garza LLC,finance,11-50,FR,False,2024-12-20,484
+5022,Williams-Davis,technology,1-10,BR,False,2024-06-27,367
+5023,Douglas-Williams,government,501-1000,US,False,2024-04-20,1867
+5024,Wyatt Inc,healthcare,501-1000,GB,True,2024-09-25,2799
+5025,White PLC,technology,11-50,BR,True,2024-08-16,1968
+5026,Rogers-Espinoza,healthcare,51-200,US,False,2024-12-05,636
+5027,Grant LLC,finance,51-200,DE,True,2024-11-27,1049
+5028,Aguirre-Jones,ecommerce,1-10,US,True,2024-09-16,153
+5029,Jennings PLC,finance,1-10,US,False,2024-02-03,6531
+5030,Hart-Ellison,finance,11-50,US,True,2024-12-25,18061
+5031,Wilson-Tucker,technology,1-10,US,True,2024-06-21,1109
+5032,Hogan-Jackson,media,11-50,US,True,2024-09-04,4136
+5033,"James, Moore and Kelley",technology,51-200,BR,True,2024-02-15,1937
+5034,"Nguyen, Smith and Smith",technology,51-200,FR,False,2024-11-19,820
+5035,Jimenez and Sons,ecommerce,501-1000,GB,True,2024-02-24,3832
+5036,Oliver-Smith,technology,11-50,US,True,2024-09-02,461
+5037,Brown and Sons,technology,51-200,GB,False,2024-01-29,7533
+5038,"Lawrence, Walker and Barajas",technology,1-10,IN,False,2024-10-04,2873
+5039,Murray-Shields,technology,11-50,DE,False,2024-09-16,3451
+5040,"Hendricks, Cordova and Robinson",gaming,1-10,FR,True,2024-04-23,212
+5041,Stanley and Sons,education,51-200,CA,True,2024-07-23,597
+5042,Bradford PLC,media,1-10,GB,True,2024-05-26,2216
+5043,Forbes Ltd,technology,1-10,DE,False,2024-03-15,1958
+5044,"Norman, Jordan and Mitchell",finance,11-50,GB,True,2024-05-05,871
+5045,"Allen, Bailey and Austin",finance,11-50,BR,False,2024-03-15,8063
+5046,"Taylor, Barber and Hall",technology,1-10,FR,True,2024-05-10,2437
+5047,"Montoya, Graham and Butler",technology,11-50,US,False,2024-10-23,13435
+5048,"Garcia, Johnston and Becker",technology,201-500,GB,False,2024-05-02,100
+5049,Sanders Inc,consulting,201-500,US,False,2024-12-06,1901
+5050,"Cruz, Sherman and Garcia",ecommerce,201-500,US,False,2024-12-31,466
+5051,Harris-English,finance,1-10,US,True,2024-12-20,11285
+5052,"Williams, Richardson and Morris",media,51-200,DE,False,2024-01-16,7509
+5053,Daniel Inc,technology,11-50,US,False,2024-06-22,1479
+5054,Anthony-Harrison,technology,11-50,US,True,2024-06-21,1546
+5055,Brennan-Ford,finance,1-10,US,False,2024-01-31,753
+5056,Flores-Roberts,finance,11-50,US,True,2024-07-05,458
+5057,Butler PLC,technology,11-50,US,True,2024-10-19,757
+5058,"Reyes, Griffin and Turner",technology,1000+,FR,False,2024-10-28,1170
+5059,Trevino PLC,technology,1-10,GB,True,2024-12-22,2248
+5060,"Cruz, Woodward and Barnes",technology,11-50,CA,False,2024-12-11,10676
+5061,"Riley, Martinez and Rivera",healthcare,11-50,BR,False,2024-04-12,13172
+5062,Parsons-Thompson,technology,1-10,AU,False,2024-06-12,289
+5063,Thomas-Warner,technology,51-200,JP,False,2024-02-26,581
+5064,Wright Ltd,finance,11-50,JP,False,2024-02-01,3863
+5065,"Olsen, Davila and Williams",technology,201-500,US,False,2024-04-14,2295
+5066,Jackson Inc,healthcare,1-10,US,False,2024-10-31,5147
+5067,Murillo-Ritter,healthcare,51-200,US,False,2024-05-27,100
+5068,"West, Rangel and Martin",finance,11-50,BR,False,2024-04-29,586
+5069,Myers-Brown,finance,201-500,US,False,2024-02-04,1183
+5070,"Coleman, Phillips and Blankenship",healthcare,1000+,IN,False,2024-08-07,3638
+5071,Richardson-Watson,technology,11-50,SG,False,2024-10-18,2875
+5072,"Garrett, Walker and Johnson",education,501-1000,CA,False,2024-03-17,2039
+5073,"Taylor, Summers and Martinez",education,501-1000,GB,False,2024-11-28,4419
+5074,Myers LLC,finance,1-10,US,True,2024-11-21,1289
+5075,Wheeler-Fitzpatrick,finance,1-10,JP,False,2024-01-26,3037
+5076,Hernandez-Mitchell,education,51-200,GB,False,2024-12-08,778
+5077,"Chang, Ortega and Hansen",finance,1-10,US,False,2024-01-05,165
+5078,Ayers Group,technology,1-10,US,False,2024-01-05,711
+5079,Douglas Inc,gaming,11-50,IN,False,2024-04-22,7080
+5080,Barrett Ltd,technology,11-50,AU,False,2024-10-17,38473
+5081,"Wolfe, Welch and Evans",media,11-50,DE,True,2024-12-12,8655
+5082,Wilson and Sons,technology,1-10,DE,True,2024-04-03,3536
+5083,Carter-Rogers,education,201-500,US,True,2024-01-03,9813
+5084,"Henderson, Smith and Harris",consulting,1-10,DE,False,2024-03-29,373
+5085,Chambers Inc,technology,1-10,US,True,2024-03-07,100
+5086,"Meyer, Griffith and Jenkins",healthcare,51-200,US,True,2024-07-01,1612
+5087,Sherman-Holloway,finance,1-10,US,False,2024-03-09,2760
+5088,Miller-Becker,finance,1000+,US,False,2024-05-11,1534
+5089,Choi and Sons,technology,1-10,IN,False,2024-07-02,5289
+5090,Reyes Group,technology,201-500,IN,True,2024-12-21,14530
+5091,Simon-Bradford,healthcare,11-50,AU,True,2024-05-24,15539
+5092,Nunez LLC,technology,11-50,BR,False,2024-11-17,621
+5093,Moses-Bolton,consulting,51-200,US,False,2024-09-30,50000
+5094,Miles Inc,consulting,51-200,GB,False,2024-10-03,1206
+5095,Smith-Wilson,finance,1-10,US,False,2024-07-05,2207
+5096,Browning-Wang,technology,201-500,GB,False,2024-06-15,237
+5097,Williams-Novak,technology,201-500,GB,False,2024-06-18,3734
+5098,"Rodriguez, Juarez and Lane",media,1-10,US,True,2024-09-02,10131
+5099,"Rodriguez, Reed and Jordan",technology,51-200,DE,False,2024-05-06,100
+5100,Tran Inc,technology,201-500,IN,False,2024-05-25,3686
+5101,Roberts-Arnold,technology,1-10,US,True,2024-12-04,5924
+5102,Murphy-Taylor,technology,51-200,IN,False,2024-06-29,2029
+5103,"Flores, Woods and Miranda",finance,11-50,US,False,2024-08-12,9236
+5104,Schmidt-Wallace,healthcare,201-500,CA,False,2024-09-22,507
+5105,Howell-Richards,finance,1-10,US,False,2024-11-22,4372
+5106,Velez PLC,technology,501-1000,SG,True,2024-12-05,1814
+5107,"Martinez, Wilson and Simon",gaming,201-500,BR,True,2024-12-02,2350
+5108,Brown-Hernandez,education,1-10,JP,False,2024-03-27,648
+5109,Alvarado LLC,gaming,201-500,US,True,2024-10-20,3786
+5110,Parker-Montes,technology,1-10,GB,False,2024-10-15,110
+5111,Parks LLC,finance,51-200,US,False,2024-06-01,418
+5112,Nixon LLC,ecommerce,51-200,FR,False,2024-09-20,1516
+5113,"Williams, Myers and Cruz",technology,11-50,US,False,2024-06-25,3883
+5114,Goodman and Sons,technology,11-50,US,True,2024-02-17,642
+5115,"Davis, Roberts and Mahoney",technology,1-10,US,False,2024-08-07,212
+5116,Torres-Woodard,technology,1-10,DE,False,2024-07-28,4017
+5117,"Ray, Lewis and Walker",finance,1-10,SG,True,2024-02-03,2319
+5118,Horton and Sons,healthcare,501-1000,US,False,2024-05-22,3605
+5119,"Thomas, Taylor and Martinez",technology,201-500,FR,True,2024-07-11,4852
+5120,Smith-Cruz,technology,1-10,SG,False,2024-09-09,30339
+5121,Douglas PLC,technology,1-10,US,False,2024-04-02,122
+5122,"Elliott, Sweeney and Anderson",ecommerce,201-500,US,False,2024-09-11,495
+5123,Sutton-Wright,government,1-10,US,False,2024-02-27,1460
+5124,"Torres, Dominguez and Williams",healthcare,1-10,US,False,2024-07-01,1958
+5125,Small Ltd,technology,51-200,US,True,2024-04-15,980
+5126,Caldwell Ltd,healthcare,1-10,US,False,2024-07-25,7888
+5127,"Duncan, Weeks and Aguilar",technology,11-50,US,False,2024-04-19,115
+5128,Green Inc,finance,201-500,SG,False,2024-03-20,8992
+5129,Brown-Simmons,ecommerce,1-10,FR,False,2024-12-10,1567
+5130,Pugh Ltd,technology,11-50,BR,True,2024-02-09,13911
+5131,"Wright, Bray and Allen",technology,51-200,JP,False,2024-03-20,1050
+5132,Williams Ltd,technology,11-50,GB,False,2024-06-14,644
+5133,Berry and Sons,healthcare,11-50,GB,False,2024-07-17,9018
+5134,Parker-Barnes,technology,51-200,US,False,2024-05-21,387
+5135,Brown Ltd,media,201-500,US,True,2024-09-01,686
+5136,Kim-Hobbs,education,1-10,US,True,2024-03-18,407
+5137,Henry Ltd,technology,1-10,BR,False,2024-01-19,9599
+5138,Strong-Conrad,consulting,201-500,FR,True,2024-04-28,8072
+5139,Fisher LLC,finance,1-10,US,False,2024-11-10,3536
+5140,"Patel, Hall and Watson",finance,1-10,CA,False,2024-03-08,31006
+5141,"Watson, Cox and Garcia",technology,1-10,US,True,2024-04-10,2235
+5142,Williams Inc,technology,1-10,IN,True,2024-09-04,3824
+5143,Harrison-Garcia,education,501-1000,BR,False,2024-05-16,1038
+5144,"Shepard, Douglas and Rowland",finance,11-50,GB,True,2024-11-15,1223
+5145,Stokes and Sons,technology,1-10,US,False,2024-05-01,21224
+5146,Cole-Garcia,technology,11-50,GB,False,2024-09-13,1114
+5147,Villegas Inc,technology,51-200,US,False,2024-07-20,818
+5148,Alexander-Taylor,technology,1-10,JP,False,2024-10-03,779
+5149,"Phillips, Smith and Moore",finance,1-10,FR,False,2024-11-23,2306
+5150,Smith-Gross,technology,11-50,GB,False,2024-04-19,5486
+5151,"Ewing, Brown and Peterson",ecommerce,51-200,IN,False,2024-10-17,2793
+5152,Coleman-Wright,media,1-10,GB,True,2024-10-21,5477
+5153,"Meyer, Jacobs and Clark",education,11-50,FR,False,2024-04-04,6409
+5154,Figueroa-Murphy,technology,1-10,GB,False,2024-01-07,540
+5155,"Lawrence, Wright and Hunt",technology,201-500,AU,True,2024-03-12,1436
+5156,White-Palmer,finance,11-50,US,False,2024-02-13,2837
+5157,"Rose, Thomas and Gallegos",technology,11-50,BR,False,2024-04-11,728
+5158,Stark-Noble,finance,201-500,FR,False,2024-07-12,169
+5159,"Moody, Franklin and Tucker",technology,1-10,US,False,2024-06-26,1870
+5160,"Hill, Carlson and Schneider",technology,1-10,DE,True,2024-11-24,231
+5161,Vazquez-Baker,technology,1-10,SG,True,2024-10-30,3506
+5162,Cruz Group,technology,1-10,JP,False,2024-05-30,302
+5163,"Navarro, Smith and Wilson",finance,1-10,US,False,2024-06-26,252
+5164,West-Hart,technology,51-200,US,False,2024-10-31,9659
+5165,"Mahoney, Jones and Aguilar",finance,501-1000,US,False,2024-07-15,2229
+5166,Wells-Conway,media,1-10,GB,False,2024-09-13,238
+5167,Johnson-Hull,healthcare,1-10,US,True,2024-05-29,901
+5168,"Browning, Kane and Davis",government,1-10,IN,False,2024-12-14,1355
+5169,Green-Harris,healthcare,11-50,US,False,2024-03-24,24982
+5170,"Walter, Bradley and Liu",finance,1-10,US,False,2024-04-24,2764
+5171,"Wright, Serrano and Bernard",technology,51-200,GB,True,2024-11-05,6872
+5172,Sanchez Group,technology,1000+,JP,False,2024-06-20,392
+5173,Adams-Larsen,finance,1-10,GB,False,2024-03-14,535
+5174,"Goodwin, Gutierrez and Choi",media,51-200,US,False,2024-05-09,2112
+5175,"Robinson, Taylor and Mitchell",finance,1-10,US,False,2024-07-16,324
+5176,Garrison and Sons,ecommerce,1-10,US,False,2024-07-17,12892
+5177,Hanson LLC,healthcare,11-50,US,True,2024-11-05,142
+5178,Johnson-Dyer,technology,1-10,CA,True,2024-05-22,35948
+5179,Jones Group,technology,201-500,CA,False,2024-06-02,2427
+5180,"Shaffer, Contreras and Miller",technology,1-10,US,False,2024-02-17,1277
+5181,"Hall, White and Johnson",technology,1-10,US,False,2024-02-25,50000
+5182,Wright Ltd,education,1-10,BR,False,2024-07-26,3862
+5183,"Christensen, Ibarra and Gonzales",healthcare,11-50,US,False,2024-08-02,1460
+5184,Miller PLC,gaming,1-10,BR,False,2024-02-07,368
+5185,"Harris, Perez and Ray",technology,1000+,DE,False,2024-05-14,33611
+5186,Mills-Johnson,technology,1-10,GB,True,2024-10-15,3242
+5187,Cummings Group,finance,11-50,US,True,2024-04-03,2328
+5188,Snyder-Harrison,finance,51-200,DE,True,2024-09-08,45374
+5189,Shaw-Hernandez,finance,1-10,US,False,2024-11-09,16420
+5190,"Johnson, Le and Cook",healthcare,11-50,US,True,2024-05-30,1048
+5191,Stephenson PLC,technology,51-200,US,True,2024-05-15,12940
+5192,Horton and Sons,healthcare,1-10,AU,False,2024-06-17,196
+5193,Olson Inc,education,1-10,GB,True,2024-06-03,21927
+5194,"Kidd, Perez and Smith",healthcare,1000+,BR,False,2024-11-25,100
+5195,Wilkinson-Wilkerson,saas,501-1000,US,False,2024-07-07,1405
+5196,Patterson PLC,technology,51-200,US,False,2024-10-14,1291
+5197,"Kane, Roy and Sparks",technology,1000+,US,False,2024-01-11,18896
+5198,Moore-Gonzales,ecommerce,1-10,FR,False,2024-05-31,4171
+5199,Hicks-Vance,ecommerce,201-500,US,False,2024-04-06,980

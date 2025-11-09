@@ -1,0 +1,95 @@
+{
+  "dataset_name": "MarketingGrowthAnalytics",
+  "version": "1.0",
+  "master_seed": 42,
+  "tables": {
+    "campaigns": {
+      "rows": 50,
+      "columns": 7
+    },
+    "companies": {
+      "rows": 200,
+      "columns": 8
+    },
+    "products": {
+      "rows": 20,
+      "columns": 5
+    },
+    "social_accounts": {
+      "rows": 8,
+      "columns": 4
+    },
+    "survey_templates": {
+      "rows": 15,
+      "columns": 4
+    },
+    "content": {
+      "rows": 150,
+      "columns": 6
+    },
+    "email_templates": {
+      "rows": 30,
+      "columns": 4
+    },
+    "hackathons": {
+      "rows": 12,
+      "columns": 6
+    },
+    "people": {
+      "rows": 1000,
+      "columns": 8
+    },
+    "social_posts": {
+      "rows": 386,
+      "columns": 6
+    },
+    "campaign_mentions": {
+      "rows": 3040,
+      "columns": 7
+    },
+    "email_sends": {
+      "rows": 251,
+      "columns": 7
+    },
+    "hackathon_submissions": {
+      "rows": 384,
+      "columns": 7
+    },
+    "newsletter_sends": {
+      "rows": 12074,
+      "columns": 6
+    },
+    "product_events": {
+      "rows": 993,
+      "columns": 7
+    },
+    "seo_daily_metrics": {
+      "rows": 49408,
+      "columns": 8
+    },
+    "social_engagement": {
+      "rows": 9787,
+      "columns": 5
+    },
+    "support_tickets": {
+      "rows": 2938,
+      "columns": 8
+    },
+    "survey_responses": {
+      "rows": 74,
+      "columns": 7
+    },
+    "transactions": {
+      "rows": 1534,
+      "columns": 9
+    },
+    "user_sessions": {
+      "rows": 14964,
+      "columns": 9
+    },
+    "session_events": {
+      "rows": 179725,
+      "columns": 6
+    }
+  }
+}

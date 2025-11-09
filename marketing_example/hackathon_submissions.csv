@@ -1,0 +1,385 @@
+submission_id,hackathon_id,team_name,submitted_at,quality_score,used_product,prize_won
+40000,500,Webb-Bean,2024-03-30 13:00:00,5,True,False
+40001,500,"Castro, Mckay and Bartlett",2024-08-18 05:00:00,8,False,False
+40002,500,Wright-Mcgee,2024-02-07 17:00:00,7,False,False
+40003,500,Smith-Frank,2024-09-27 23:00:00,6,False,False
+40004,500,Oneill Group,2024-01-16 22:00:00,5,True,False
+40005,500,Blair-White,2024-01-29 07:00:00,6,True,False
+40006,500,Dean PLC,2024-03-25 16:00:00,6,True,False
+40007,500,Moreno Ltd,2024-09-30 02:00:00,6,True,False
+40008,500,"Wolfe, Harris and James",2024-10-12 10:00:00,7,True,False
+40009,500,Dean-Dalton,2024-05-24 10:00:00,7,True,False
+40010,500,Floyd-Watson,2024-12-07 19:00:00,5,True,False
+40011,500,Jackson and Sons,2024-12-02 04:00:00,5,True,False
+40012,500,Riley Inc,2024-11-26 11:00:00,6,False,False
+40013,500,Greene LLC,2024-01-16 23:00:00,5,True,False
+40014,500,Lee-Silva,2024-11-14 19:00:00,7,True,False
+40015,500,Parker-Williams,2024-06-28 14:00:00,5,False,False
+40016,500,Sanchez-Nelson,2024-05-05 02:00:00,7,True,False
+40017,500,"Tucker, Ramirez and Ford",2024-01-05 13:00:00,5,True,False
+40018,500,"Raymond, Cruz and Lee",2024-02-06 15:00:00,5,False,False
+40019,500,Duncan Ltd,2024-05-07 09:00:00,6,True,True
+40020,500,"Floyd, Jones and Wilcox",2024-01-01 12:00:00,5,True,True
+40021,500,Wells Ltd,2024-04-01 01:00:00,7,False,False
+40022,500,Berry-Thompson,2024-08-25 00:00:00,6,True,False
+40023,500,Vaughn LLC,2024-02-10 00:00:00,7,False,False
+40024,500,"Guerrero, Rios and Marshall",2024-10-19 16:00:00,6,True,False
+40025,500,Willis-Williams,2024-05-14 16:00:00,6,False,False
+40026,500,Lawrence Ltd,2024-04-23 23:00:00,5,False,False
+40027,500,Cowan-Coleman,2024-02-25 03:00:00,8,True,False
+40028,500,Edwards and Sons,2024-06-05 22:00:00,7,False,False
+40029,500,Nelson LLC,2024-03-31 04:00:00,7,False,False
+40030,500,Maldonado-Smith,2024-09-11 22:00:00,6,False,False
+40031,500,"Moore, Williams and Alexander",2024-08-14 07:00:00,4,False,False
+40032,500,"Kent, Elliott and Young",2024-04-18 16:00:00,5,True,False
+40033,500,Jones-Woods,2024-01-30 00:00:00,6,False,False
+40034,500,Castro and Sons,2024-07-28 15:00:00,5,True,False
+40035,500,Johnson Group,2024-06-20 09:00:00,6,True,False
+40036,500,"Hernandez, Hanna and Phillips",2024-11-21 20:00:00,5,True,False
+40037,500,Edwards-Lee,2024-06-17 22:00:00,6,False,False
+40038,500,Hart Inc,2024-08-13 03:00:00,5,True,False
+40039,500,Solomon and Sons,2024-06-05 15:00:00,6,False,False
+40040,500,"Clements, Acosta and Martinez",2024-10-30 20:00:00,7,True,False
+40041,500,Mathis PLC,2024-11-30 05:00:00,7,True,False
+40042,500,Jones-Huerta,2024-04-02 18:00:00,6,True,False
+40043,500,Green-Robertson,2024-11-13 06:00:00,6,True,False
+40044,500,Clayton-Rojas,2024-03-09 09:00:00,6,True,False
+40045,500,"Carter, Wilson and Craig",2024-10-13 15:00:00,7,False,False
+40046,500,Mcclain PLC,2024-01-19 15:00:00,7,True,False
+40047,500,"Munoz, Clark and Shelton",2024-06-08 22:00:00,7,True,False
+40048,501,"Crane, Joyce and Shea",2024-09-09 06:00:00,6,True,True
+40049,501,"Kim, Nelson and Mendoza",2024-10-27 08:00:00,5,False,False
+40050,501,"Mccormick, Long and Gonzalez",2024-06-18 07:00:00,7,False,False
+40051,501,Williams Group,2024-03-08 21:00:00,6,True,True
+40052,501,Sosa PLC,2024-03-26 04:00:00,5,True,False
+40053,501,Ramos-Bolton,2024-05-14 03:00:00,5,True,True
+40054,501,Cantrell Inc,2024-09-04 21:00:00,5,True,False
+40055,501,"Taylor, Ruiz and Davis",2024-05-29 22:00:00,7,True,False
+40056,501,"Herrera, Li and Pierce",2024-08-31 17:00:00,5,False,False
+40057,501,"Martinez, Roth and Smith",2024-03-02 11:00:00,6,True,True
+40058,502,Thomas Group,2024-06-11 19:00:00,6,True,False
+40059,502,"Lewis, Torres and Evans",2024-05-16 02:00:00,7,False,False
+40060,502,Miller-Robinson,2024-04-11 15:00:00,6,True,False
+40061,502,Roberts and Sons,2024-04-05 08:00:00,7,True,False
+40062,502,Sims Inc,2024-09-03 21:00:00,8,False,False
+40063,502,Nelson Ltd,2024-05-13 18:00:00,7,False,False
+40064,502,Williams LLC,2024-11-05 16:00:00,7,True,False
+40065,502,"Powell, Tate and Zhang",2024-06-11 20:00:00,5,True,True
+40066,502,"Fitzpatrick, Cross and Yu",2024-01-19 09:00:00,6,True,False
+40067,502,Brown-Novak,2024-12-13 17:00:00,8,True,False
+40068,502,Robertson and Sons,2024-01-08 15:00:00,4,True,False
+40069,502,"Meza, Jenkins and Williams",2024-12-20 14:00:00,6,True,False
+40070,502,Solomon Group,2024-03-05 19:00:00,6,False,False
+40071,502,Mckinney Ltd,2024-04-30 10:00:00,6,False,False
+40072,502,"Daugherty, Mcdaniel and Graham",2024-08-11 04:00:00,5,False,False
+40073,502,"Garrett, Gonzalez and Sanchez",2024-02-06 01:00:00,7,True,False
+40074,502,Collins-Young,2024-03-12 12:00:00,7,False,False
+40075,502,"Miller, Mitchell and Stanley",2024-06-27 01:00:00,7,False,False
+40076,502,Ray PLC,2024-12-20 11:00:00,5,False,False
+40077,502,"Martin, Burgess and Vargas",2024-05-12 05:00:00,7,True,False
+40078,502,"Montgomery, Mata and Kim",2024-02-09 12:00:00,5,False,False
+40079,502,Alexander and Sons,2024-01-03 06:00:00,8,True,False
+40080,502,Taylor Group,2024-06-17 08:00:00,6,False,False
+40081,502,"Navarro, Green and Smith",2024-11-15 18:00:00,7,True,False
+40082,503,Garcia-Gonzalez,2024-07-31 14:00:00,5,True,True
+40083,503,Flowers Ltd,2024-06-26 01:00:00,7,False,False
+40084,503,Horton-Allen,2024-02-09 09:00:00,5,True,False
+40085,503,Webster Group,2024-12-12 10:00:00,6,True,False
+40086,503,Watkins Group,2024-11-07 14:00:00,7,True,False
+40087,503,Barnes-Norman,2024-07-08 13:00:00,6,True,False
+40088,503,Murphy PLC,2024-08-20 02:00:00,6,True,False
+40089,503,Ayala-Cook,2024-09-15 22:00:00,7,False,False
+40090,503,Myers-Humphrey,2024-09-24 17:00:00,8,False,False
+40091,503,Garcia-Richard,2024-07-02 10:00:00,6,True,False
+40092,503,"Rivera, Parrish and Walker",2024-02-29 14:00:00,6,True,True
+40093,503,Bryan-Bell,2024-08-02 10:00:00,5,False,True
+40094,503,Bradley Ltd,2024-01-10 07:00:00,7,False,False
+40095,503,"Carter, Chapman and Hess",2024-02-18 01:00:00,6,True,False
+40096,503,"Lee, Bush and Love",2024-08-26 14:00:00,7,True,False
+40097,503,Phillips Group,2024-12-01 03:00:00,5,True,False
+40098,503,Reid Group,2024-07-26 21:00:00,6,True,False
+40099,503,Jones-Rodriguez,2024-04-05 15:00:00,7,True,False
+40100,503,Murphy-Mitchell,2024-12-04 22:00:00,8,True,False
+40101,503,Herring Ltd,2024-08-28 11:00:00,7,True,False
+40102,503,Baldwin PLC,2024-10-01 12:00:00,7,True,False
+40103,503,Hale LLC,2024-07-29 08:00:00,5,False,False
+40104,503,Ewing-Lam,2024-11-06 08:00:00,7,True,False
+40105,503,"Steele, Knox and Porter",2024-04-09 14:00:00,6,False,False
+40106,503,"Parker, Sanders and Todd",2024-12-21 12:00:00,6,False,False
+40107,503,Snyder-Matthews,2024-06-09 01:00:00,5,False,False
+40108,503,Douglas Inc,2024-08-03 04:00:00,7,False,False
+40109,503,Price-Garza,2024-04-20 07:00:00,7,True,False
+40110,503,"Dunlap, Smith and Bradley",2024-05-17 17:00:00,6,True,False
+40111,503,"Villarreal, Kirk and Rogers",2024-05-27 12:00:00,6,False,False
+40112,503,Robinson-Sanchez,2024-03-27 17:00:00,6,True,False
+40113,503,"Taylor, Moore and Sherman",2024-06-14 04:00:00,6,True,False
+40114,503,Hebert-Johnson,2024-12-29 21:00:00,6,False,False
+40115,503,"Turner, Brewer and Avery",2024-06-30 20:00:00,7,False,False
+40116,503,"Glenn, Mitchell and Gallagher",2024-02-18 02:00:00,5,False,False
+40117,503,Cook LLC,2024-01-17 09:00:00,5,True,False
+40118,503,Smith-Lewis,2024-10-08 10:00:00,7,True,False
+40119,503,"Wilkerson, Page and Wood",2024-10-02 13:00:00,5,True,False
+40120,503,Carter-Thompson,2024-03-29 13:00:00,5,True,False
+40121,504,"Fry, Bruce and Christian",2024-09-10 09:00:00,7,False,False
+40122,504,Chavez PLC,2024-01-19 12:00:00,6,False,False
+40123,504,"Duncan, Martin and Odonnell",2024-05-29 09:00:00,7,True,False
+40124,504,"Hill, Bell and Luna",2024-07-28 19:00:00,5,True,False
+40125,504,Pope-Bowen,2024-04-07 02:00:00,8,True,False
+40126,504,Peters-Chaney,2024-10-07 17:00:00,5,True,False
+40127,504,"Livingston, Carpenter and Parker",2024-07-15 05:00:00,8,False,False
+40128,504,Carr PLC,2024-11-17 22:00:00,6,False,False
+40129,504,Downs-Terrell,2024-07-04 13:00:00,6,True,False
+40130,504,Moore LLC,2024-10-24 21:00:00,5,False,False
+40131,504,Lawrence and Sons,2024-09-08 12:00:00,6,False,False
+40132,504,"Smith, Fuentes and Cruz",2024-06-10 23:00:00,6,True,False
+40133,504,"Griffith, Taylor and Rollins",2024-06-07 01:00:00,5,True,False
+40134,504,"Reynolds, Haley and Rios",2024-11-01 16:00:00,5,False,False
+40135,504,"Garrison, Green and Osborn",2024-11-26 22:00:00,5,True,False
+40136,504,Johnson-Francis,2024-11-01 16:00:00,7,True,False
+40137,504,Palmer and Sons,2024-03-30 03:00:00,7,True,False
+40138,504,Hall-Rios,2024-08-02 09:00:00,5,True,False
+40139,504,"Williams, Mora and Donovan",2024-09-05 05:00:00,4,False,True
+40140,504,Mitchell Group,2024-11-07 15:00:00,6,True,False
+40141,504,"Walker, Gonzalez and Hoover",2024-02-08 15:00:00,8,True,False
+40142,504,Mccarthy Inc,2024-12-07 10:00:00,6,True,False
+40143,504,Carter-Walker,2024-04-13 03:00:00,5,False,False
+40144,504,"Chung, Brown and Baker",2024-09-30 01:00:00,8,False,False
+40145,504,Horton-Hubbard,2024-04-17 07:00:00,5,True,True
+40146,504,"Joseph, Vasquez and Fisher",2024-01-24 08:00:00,6,True,True
+40147,504,Willis-Ramos,2024-07-26 20:00:00,6,True,False
+40148,504,Romero and Sons,2024-09-11 11:00:00,7,False,False
+40149,504,"Holmes, Hampton and Townsend",2024-01-17 22:00:00,7,False,True
+40150,504,Valdez-Velasquez,2024-11-01 13:00:00,6,False,False
+40151,504,Foster PLC,2024-09-15 16:00:00,6,True,True
+40152,504,Potter LLC,2024-02-02 10:00:00,6,False,False
+40153,504,Cole PLC,2024-03-31 01:00:00,5,True,False
+40154,504,Herrera and Sons,2024-06-19 04:00:00,7,True,False
+40155,504,Foster Inc,2024-10-03 18:00:00,6,True,False
+40156,504,Taylor-Anderson,2024-03-31 22:00:00,5,True,False
+40157,504,Reed and Sons,2024-08-23 08:00:00,6,True,False
+40158,504,"Taylor, Hess and Jones",2024-09-27 11:00:00,6,True,False
+40159,504,Thompson-Edwards,2024-11-23 07:00:00,7,True,True
+40160,504,Collier-Moore,2024-06-12 02:00:00,7,False,True
+40161,504,Rogers-Perez,2024-11-17 09:00:00,7,True,False
+40162,504,"Short, Mendez and Patton",2024-04-09 06:00:00,7,True,False
+40163,505,Mendoza-Marshall,2024-01-26 06:00:00,6,True,False
+40164,505,Zamora-Pena,2024-10-04 23:00:00,5,True,False
+40165,505,"Mccann, Phillips and Richmond",2024-09-19 22:00:00,6,True,False
+40166,505,Graves-Leonard,2024-08-11 17:00:00,3,False,False
+40167,505,Brown Ltd,2024-08-28 13:00:00,7,True,False
+40168,505,"Espinoza, Dalton and Zuniga",2024-10-27 01:00:00,5,True,False
+40169,505,Solomon-Hampton,2024-09-21 00:00:00,7,True,False
+40170,505,Pierce-Barrett,2024-12-09 03:00:00,5,False,False
+40171,505,"Bowman, Fernandez and Smith",2024-12-02 01:00:00,6,True,False
+40172,505,Reyes Group,2024-07-15 14:00:00,6,False,False
+40173,505,"Mccarthy, Salas and Stokes",2024-08-19 18:00:00,7,True,False
+40174,505,Hall PLC,2024-09-05 15:00:00,6,True,False
+40175,505,Daniels-Morgan,2024-02-27 16:00:00,7,True,False
+40176,505,Price-Fields,2024-07-03 08:00:00,5,True,False
+40177,505,Rodgers-Logan,2024-06-28 21:00:00,4,True,False
+40178,505,Bryant and Sons,2024-04-23 19:00:00,6,False,False
+40179,505,"Green, Walsh and Harding",2024-08-25 03:00:00,6,False,False
+40180,505,"Quinn, Smith and Peters",2024-03-07 12:00:00,6,False,False
+40181,505,"Booker, Randall and Villanueva",2024-07-30 11:00:00,5,False,False
+40182,505,Lane Group,2024-05-01 15:00:00,8,True,False
+40183,506,"Galvan, Gomez and Choi",2024-02-18 14:00:00,4,False,False
+40184,506,Cherry-Brooks,2024-01-18 14:00:00,5,False,False
+40185,506,"Golden, Hernandez and Carr",2024-09-26 03:00:00,7,True,False
+40186,506,"Walker, Suarez and Robinson",2024-01-01 22:00:00,5,True,True
+40187,506,"Johnson, Young and Ford",2024-09-21 08:00:00,6,True,False
+40188,506,"Haas, Strickland and Ross",2024-04-04 22:00:00,7,False,False
+40189,506,"Carlson, Ward and Gonzalez",2024-10-25 10:00:00,7,False,False
+40190,506,Taylor-Barnes,2024-02-12 19:00:00,6,False,False
+40191,506,Smith LLC,2024-01-21 08:00:00,6,True,False
+40192,506,Bailey PLC,2024-05-07 08:00:00,7,False,False
+40193,506,"Summers, Reyes and Terrell",2024-09-20 16:00:00,5,True,True
+40194,506,"Bolton, Powell and Martinez",2024-05-15 00:00:00,7,False,False
+40195,506,Bennett-Howell,2024-02-21 15:00:00,4,True,False
+40196,506,Porter Inc,2024-06-10 05:00:00,6,False,False
+40197,506,"Cooper, Baker and Madden",2024-02-25 14:00:00,5,True,False
+40198,506,"Ford, Andrews and Porter",2024-04-29 02:00:00,7,False,False
+40199,506,"Orr, Strong and Robinson",2024-06-09 01:00:00,5,True,False
+40200,506,"Holden, Stephenson and Hudson",2024-01-19 17:00:00,7,True,False
+40201,506,"Grimes, Whitehead and Nichols",2024-04-09 16:00:00,7,True,False
+40202,506,Jackson-Krause,2024-06-06 16:00:00,5,True,False
+40203,506,Nicholson and Sons,2024-02-08 04:00:00,6,True,False
+40204,506,Clayton-Morris,2024-12-20 22:00:00,6,True,False
+40205,506,Wallace Ltd,2024-09-06 23:00:00,7,False,False
+40206,506,Hicks-Hatfield,2024-01-23 09:00:00,5,True,True
+40207,506,Matthews LLC,2024-09-27 01:00:00,7,False,True
+40208,506,"Brown, Smith and Taylor",2024-04-16 13:00:00,5,False,False
+40209,506,Gardner LLC,2024-01-01 14:00:00,5,False,False
+40210,506,Thomas Group,2024-03-24 11:00:00,7,True,False
+40211,506,Reid and Sons,2024-05-02 10:00:00,6,False,False
+40212,506,"Thompson, Le and Montgomery",2024-07-14 23:00:00,6,True,False
+40213,506,Wallace-Larsen,2024-01-30 00:00:00,5,True,False
+40214,506,Ellis Inc,2024-11-28 21:00:00,6,True,False
+40215,506,"Moran, Palmer and Jimenez",2024-08-19 01:00:00,7,False,True
+40216,506,"Diaz, Clarke and Taylor",2024-11-24 01:00:00,6,False,False
+40217,506,"Harper, Bowman and Mccoy",2024-11-25 23:00:00,7,True,True
+40218,507,Goodman Group,2024-11-21 03:00:00,6,False,False
+40219,507,"Adams, Mendez and Ramos",2024-03-30 07:00:00,6,True,True
+40220,507,"Diaz, Walton and Rasmussen",2024-10-20 13:00:00,6,True,False
+40221,507,Valencia Group,2024-06-23 00:00:00,7,False,False
+40222,507,"Tucker, Cooper and Collins",2024-10-24 17:00:00,6,False,False
+40223,507,Wilson-Huynh,2024-03-11 13:00:00,7,False,False
+40224,507,Price-Hudson,2024-12-04 00:00:00,5,True,False
+40225,507,Reed-Harris,2024-12-14 01:00:00,7,True,False
+40226,507,"Aguilar, Davis and Wilson",2024-08-01 07:00:00,6,False,False
+40227,507,Nicholson Ltd,2024-12-25 01:00:00,6,True,False
+40228,507,Harper Inc,2024-03-07 01:00:00,4,False,False
+40229,507,"Callahan, Smith and Barber",2024-09-04 11:00:00,6,False,False
+40230,507,"Williams, Hayes and Long",2024-01-09 13:00:00,7,True,False
+40231,507,Gomez-Newton,2024-05-24 22:00:00,6,True,False
+40232,508,Johnson-Brown,2024-05-05 00:00:00,7,True,False
+40233,508,Ruiz Group,2024-03-09 09:00:00,5,False,False
+40234,508,Burnett-Brown,2024-08-03 07:00:00,6,True,False
+40235,508,"Adkins, Hernandez and George",2024-02-07 00:00:00,5,False,True
+40236,508,Tate and Sons,2024-02-16 02:00:00,6,True,False
+40237,508,Burgess Inc,2024-01-17 18:00:00,6,False,False
+40238,508,Johnson-Osborne,2024-10-10 04:00:00,6,True,False
+40239,508,Gonzalez-Greene,2024-05-07 22:00:00,5,True,False
+40240,508,"Green, Fletcher and Smith",2024-09-04 01:00:00,5,True,False
+40241,508,Pratt Group,2024-05-25 21:00:00,7,True,False
+40242,508,"Garcia, Stokes and Stevenson",2024-01-10 19:00:00,4,False,True
+40243,508,"Morales, Sandoval and Cook",2024-06-09 00:00:00,5,True,False
+40244,508,Obrien-Butler,2024-03-17 09:00:00,6,True,False
+40245,508,Lewis-Downs,2024-12-26 09:00:00,7,True,False
+40246,508,Scott Group,2024-05-04 03:00:00,5,True,False
+40247,508,"Johnson, Brooks and Richard",2024-09-04 18:00:00,3,False,False
+40248,508,Krause Ltd,2024-05-18 07:00:00,7,True,False
+40249,508,"Thompson, Taylor and Ellis",2024-01-05 18:00:00,7,True,False
+40250,508,Gillespie-Wilson,2024-04-22 11:00:00,7,True,False
+40251,508,"Le, Larson and Ramirez",2024-08-27 19:00:00,5,True,False
+40252,508,"Raymond, Foley and Wheeler",2024-09-15 03:00:00,6,False,False
+40253,508,"Fowler, Cox and Taylor",2024-12-21 19:00:00,7,True,False
+40254,508,Mcneil-Smith,2024-05-21 02:00:00,4,False,False
+40255,508,"Vaughn, Williams and Gardner",2024-12-27 20:00:00,6,False,False
+40256,508,Weber-George,2024-01-15 09:00:00,6,True,False
+40257,508,Walker-Davis,2024-02-13 17:00:00,5,False,False
+40258,508,"Hansen, Henderson and Hudson",2024-04-17 01:00:00,5,True,True
+40259,508,Patrick Group,2024-11-02 05:00:00,7,True,False
+40260,508,Sanchez and Sons,2024-05-13 20:00:00,7,False,False
+40261,508,Smith Ltd,2024-09-18 04:00:00,5,False,False
+40262,508,Ramos PLC,2024-02-25 04:00:00,7,False,False
+40263,508,"Huffman, Goodman and Oliver",2024-02-06 17:00:00,7,False,True
+40264,508,"Ramirez, Navarro and Flores",2024-12-11 18:00:00,8,True,False
+40265,508,Rivera Ltd,2024-11-19 20:00:00,8,True,False
+40266,508,Davis Group,2024-09-20 12:00:00,6,True,False
+40267,508,Richards Inc,2024-01-02 00:00:00,6,False,False
+40268,508,Kennedy LLC,2024-07-04 13:00:00,6,True,False
+40269,508,Mcdonald-Allen,2024-05-12 02:00:00,7,False,False
+40270,508,"Gordon, Santiago and Flowers",2024-02-09 23:00:00,7,True,False
+40271,508,Howard PLC,2024-01-24 00:00:00,7,True,False
+40272,508,Malone-Wilson,2024-02-11 12:00:00,6,True,False
+40273,508,"Lin, Kennedy and Wong",2024-11-13 14:00:00,6,True,False
+40274,508,Rogers Group,2024-04-06 15:00:00,7,True,False
+40275,508,Barrett-Walker,2024-02-23 03:00:00,3,False,False
+40276,508,Ryan-Ryan,2024-12-24 18:00:00,6,True,False
+40277,508,Aguilar-Hernandez,2024-09-08 04:00:00,6,True,False
+40278,508,Hall-Miller,2024-09-24 07:00:00,4,True,False
+40279,508,Chavez Inc,2024-08-31 10:00:00,6,True,False
+40280,508,"Boone, Weaver and Weiss",2024-09-14 21:00:00,6,True,False
+40281,508,Spencer-Burgess,2024-01-03 16:00:00,7,False,False
+40282,509,White-Watson,2024-02-16 15:00:00,5,True,False
+40283,509,Krause-Cooper,2024-12-03 18:00:00,6,True,False
+40284,509,Bryant Group,2024-01-06 13:00:00,6,True,False
+40285,509,Harris and Sons,2024-06-22 00:00:00,5,True,False
+40286,509,"Johns, Jackson and Levy",2024-01-07 22:00:00,7,True,True
+40287,509,Beck LLC,2024-03-17 19:00:00,6,True,False
+40288,509,Bradford Ltd,2024-05-31 04:00:00,6,True,False
+40289,509,Herrera and Sons,2024-05-16 07:00:00,5,True,False
+40290,509,Griffith LLC,2024-01-22 09:00:00,8,True,True
+40291,509,Patterson LLC,2024-08-19 03:00:00,6,True,False
+40292,509,Harris-Price,2024-01-13 20:00:00,5,True,False
+40293,509,"White, Heath and Henderson",2024-07-08 11:00:00,3,True,False
+40294,509,Sanford-Martin,2024-04-30 10:00:00,5,True,False
+40295,509,"Boyd, Owen and Smith",2024-02-13 02:00:00,5,False,False
+40296,509,Frazier-Benitez,2024-01-21 00:00:00,6,True,False
+40297,509,"Rodriguez, Alvarado and Wilson",2024-11-23 23:00:00,5,False,False
+40298,509,"Johnson, Ferrell and King",2024-02-18 06:00:00,8,True,False
+40299,509,Lopez PLC,2024-08-23 13:00:00,4,True,False
+40300,509,"Dixon, Roberts and Garrett",2024-01-25 20:00:00,7,False,False
+40301,509,"Mahoney, Flowers and Hendricks",2024-11-26 02:00:00,5,True,False
+40302,509,Young and Sons,2024-08-04 00:00:00,7,True,False
+40303,509,"Lopez, Cole and Pearson",2024-08-26 19:00:00,6,False,False
+40304,509,"Taylor, Roberts and Sullivan",2024-04-12 06:00:00,6,True,False
+40305,509,Stone Inc,2024-10-07 22:00:00,5,True,False
+40306,509,Smith-Jones,2024-10-23 11:00:00,6,False,False
+40307,509,"Brooks, Adams and Roberts",2024-09-07 23:00:00,5,False,False
+40308,509,Bates Inc,2024-04-08 20:00:00,7,True,False
+40309,509,Love-Huff,2024-08-13 05:00:00,7,True,False
+40310,509,Tyler-Bird,2024-12-12 07:00:00,6,True,False
+40311,509,"Taylor, Patterson and Guerrero",2024-02-15 16:00:00,7,False,False
+40312,509,"Mata, Taylor and Gonzalez",2024-11-29 04:00:00,6,True,False
+40313,509,Kerr LLC,2024-02-12 08:00:00,5,False,True
+40314,509,Barry Group,2024-03-16 02:00:00,8,True,False
+40315,509,"Wilcox, Clark and Ruiz",2024-01-23 06:00:00,5,True,False
+40316,509,Collins-Robertson,2024-04-01 05:00:00,7,True,False
+40317,509,"Ellis, Bond and Nicholson",2024-01-18 06:00:00,7,False,False
+40318,509,Archer and Sons,2024-04-16 04:00:00,7,True,False
+40319,509,Green-Boyer,2024-09-28 17:00:00,6,True,False
+40320,509,Vega-Figueroa,2024-04-25 22:00:00,5,True,False
+40321,510,Perez Group,2024-04-13 10:00:00,5,True,False
+40322,510,Ho-Morris,2024-06-12 23:00:00,4,True,False
+40323,510,Smith-Ritter,2024-04-18 14:00:00,6,False,False
+40324,510,Thomas LLC,2024-07-11 11:00:00,6,False,False
+40325,510,Jones-Reyes,2024-01-07 14:00:00,6,True,False
+40326,510,Cannon-Jones,2024-06-21 16:00:00,6,True,False
+40327,510,Brown and Sons,2024-06-20 04:00:00,5,True,False
+40328,510,"Hill, Roberts and Nunez",2024-09-26 16:00:00,6,True,False
+40329,510,Barnes LLC,2024-01-12 22:00:00,6,True,False
+40330,510,"Peters, Ortega and Brock",2024-01-03 21:00:00,5,True,False
+40331,510,Zimmerman PLC,2024-03-22 19:00:00,7,True,False
+40332,510,Cox-Wagner,2024-05-29 22:00:00,6,False,False
+40333,510,"Bennett, Hampton and King",2024-02-18 14:00:00,6,True,True
+40334,510,Long-Oneal,2024-03-23 07:00:00,6,True,False
+40335,510,Solis Group,2024-08-03 22:00:00,6,True,False
+40336,510,Holt-Garrison,2024-05-12 11:00:00,8,False,False
+40337,510,Le-Kirby,2024-08-25 15:00:00,6,True,False
+40338,511,Hess-Moss,2024-10-12 19:00:00,6,False,False
+40339,511,"Brown, Wilcox and Johnson",2024-10-24 13:00:00,5,False,False
+40340,511,"Case, Mendoza and Fitzgerald",2024-04-24 06:00:00,7,False,False
+40341,511,Myers and Sons,2024-12-17 00:00:00,5,True,True
+40342,511,Gonzales PLC,2024-09-14 07:00:00,5,True,True
+40343,511,Adams Ltd,2024-12-07 22:00:00,7,False,False
+40344,511,"Smith, Brandt and Johnson",2024-07-28 16:00:00,6,True,False
+40345,511,Harris LLC,2024-01-19 22:00:00,6,False,False
+40346,511,Phillips LLC,2024-04-03 09:00:00,6,False,False
+40347,511,Sanchez Inc,2024-05-18 16:00:00,7,True,False
+40348,511,Walton Ltd,2024-03-08 02:00:00,7,True,False
+40349,511,Wong-Gray,2024-10-22 02:00:00,6,False,False
+40350,511,Harris and Sons,2024-02-05 00:00:00,7,True,False
+40351,511,Smith and Sons,2024-02-27 21:00:00,7,True,False
+40352,511,"White, Aguirre and Hull",2024-12-15 19:00:00,6,True,False
+40353,511,Brown LLC,2024-12-20 19:00:00,8,True,False
+40354,511,"Fox, Davis and Dudley",2024-06-10 14:00:00,6,True,False
+40355,511,Turner PLC,2024-02-14 12:00:00,6,True,False
+40356,511,Herrera PLC,2024-10-01 19:00:00,5,True,False
+40357,511,Serrano and Sons,2024-01-30 17:00:00,6,True,False
+40358,511,Jimenez LLC,2024-05-02 14:00:00,6,True,True
+40359,511,Bird-Fuentes,2024-11-18 09:00:00,5,True,False
+40360,511,Frye Ltd,2024-05-06 07:00:00,8,True,False
+40361,511,Landry-Adams,2024-10-03 13:00:00,8,False,False
+40362,511,Jones-Wall,2024-01-27 08:00:00,6,True,False
+40363,511,"Walker, Garcia and Williams",2024-10-11 06:00:00,7,True,True
+40364,511,Rose Inc,2024-09-08 06:00:00,6,True,False
+40365,511,Gallagher-Johnson,2024-06-07 21:00:00,5,False,False
+40366,511,Diaz-Ewing,2024-02-21 16:00:00,7,True,False
+40367,511,Young and Sons,2024-03-20 02:00:00,7,True,True
+40368,511,Davis PLC,2024-04-13 17:00:00,6,True,False
+40369,511,Mullins-Velasquez,2024-08-05 17:00:00,5,False,False
+40370,511,Sanders Group,2024-02-18 05:00:00,6,False,False
+40371,511,Roberts LLC,2024-04-13 16:00:00,8,True,False
+40372,511,Flynn PLC,2024-05-04 18:00:00,5,True,False
+40373,511,"Harris, Phelps and Hale",2024-07-21 17:00:00,8,True,False
+40374,511,Roberts-Barton,2024-08-14 19:00:00,5,False,False
+40375,511,Jimenez-Jimenez,2024-06-10 13:00:00,6,True,False
+40376,511,Wilson-Morrow,2024-02-16 05:00:00,7,True,False
+40377,511,"Morris, Faulkner and Ruiz",2024-02-22 13:00:00,5,True,False
+40378,511,White Inc,2024-07-20 00:00:00,5,True,False
+40379,511,"Guzman, Berg and Raymond",2024-04-11 17:00:00,8,True,False
+40380,511,Alvarez-Bryant,2024-01-31 02:00:00,6,True,False
+40381,511,Morgan Ltd,2024-09-07 15:00:00,7,True,False
+40382,511,"Esparza, Jenkins and Williams",2024-07-17 22:00:00,6,False,False
+40383,511,Johnson-Hodges,2024-02-06 11:00:00,5,True,False

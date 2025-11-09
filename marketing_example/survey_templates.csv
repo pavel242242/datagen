@@ -1,0 +1,16 @@
+survey_id,survey_name,survey_type,created_date
+700,Documentation Quality,nps,2024-02-29
+701,Support Satisfaction,nps,2024-01-31
+702,API Developer Survey,feedback,2024-07-31
+703,Quarterly Check-in,nps,2024-12-31
+704,Feature Request,nps,2024-05-31
+705,Pricing Feedback,satisfaction,2024-01-31
+706,Quarterly Check-in,nps,2024-11-30
+707,Event Feedback,feedback,2024-04-30
+708,Feature Request,exit,2024-01-31
+709,Documentation Quality,nps,2024-10-31
+710,Pricing Feedback,nps,2024-09-30
+711,Onboarding Feedback,feedback,2024-07-31
+712,Integration Feedback,feedback,2024-01-31
+713,Exit Survey,feedback,2024-05-31
+714,Onboarding Feedback,feedback,2024-08-31

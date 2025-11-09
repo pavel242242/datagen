@@ -1,0 +1,31 @@
+template_id,template_name,template_type,campaign_id
+300,Onboarding Day 30,transactional,1014
+301,New Case Study,announcement,1001
+302,Trial Expiring Soon,promotional,1038
+303,Customer Success Check-in,promotional,1027
+304,Security Alert,announcement,1006
+305,Referral Request,onboarding,1046
+306,Win-back Campaign,promotional,1043
+307,Feature Update,newsletter,1008
+308,Onboarding Day 30,announcement,1013
+309,Webinar Invitation,promotional,1024
+310,Win-back Campaign,announcement,1011
+311,Documentation Update,onboarding,1003
+312,Testimonial Request,transactional,1043
+313,Onboarding Day 7,announcement,1033
+314,Maintenance Notice,nurture,1006
+315,Weekly Newsletter,newsletter,1015
+316,Product Announcement,onboarding,1002
+317,Trial Expiring Soon,announcement,1039
+318,Referral Request,onboarding,1042
+319,Weekly Newsletter,announcement,1011
+320,Onboarding Day 30,promotional,1009
+321,Event Reminder,transactional,1003
+322,Event Reminder,onboarding,1006
+323,Upgrade Prompt,newsletter,1032
+324,Maintenance Notice,nurture,1019
+325,Referral Request,transactional,1004
+326,Weekly Newsletter,newsletter,1015
+327,Event Reminder,newsletter,1003
+328,Survey Request,onboarding,1014
+329,Testimonial Request,transactional,1016

@@ -1,0 +1,151 @@
+content_id,title,content_type,published_date,primary_keyword,campaign_id
+2000,Case Study: Fortune 500 Migration,landing_page,2024-02-15,code generation,1015
+2001,Technical Architecture Overview,blog_post,2024-06-22,ai api,1023
+2002,Technical Architecture Overview,blog_post,2024-12-12,ai api,1042
+2003,Best Practices for AI Integration,documentation,2024-10-08,developer productivity,1048
+2004,Enterprise Feature Announcement,documentation,2024-02-23,ai api,1022
+2005,Testing Strategies for Developers,blog_post,2024-11-09,developer productivity,1041
+2006,Building Developer Communities,blog_post,2024-06-05,developer tools,1029
+2007,Testing Strategies for Developers,documentation,2024-01-13,ai api,1030
+2008,Advanced Features Deep Dive,documentation,2024-09-16,ai api,1007
+2009,How We Built Our MCP Architecture,blog_post,2024-07-30,ai api,1003
+2010,Technical Architecture Overview,blog_post,2024-04-20,open source,1030
+2011,Best Practices for AI Integration,blog_post,2024-07-05,automation,1008
+2012,Data Privacy and GDPR,documentation,2024-08-09,api platform,1032
+2013,Monitoring and Observability,case_study,2024-08-15,ai api,1007
+2014,Scaling to Millions of Requests,blog_post,2024-12-17,ai api,1042
+2015,Advanced Features Deep Dive,blog_post,2024-06-14,llm integration,1014
+2016,CLI Quick Start Tutorial,case_study,2024-12-30,saas api,1043
+2017,Security Best Practices,documentation,2024-02-03,ai api,1036
+2018,Scaling to Millions of Requests,tutorial,2024-05-26,developer productivity,1035
+2019,Troubleshooting Common Issues,documentation,2024-09-01,ai api,1008
+2020,Weekly Product Updates,blog_post,2024-01-25,developer tools,1009
+2021,CLI Quick Start Tutorial,changelog,2024-11-28,saas api,1013
+2022,Troubleshooting Common Issues,landing_page,2024-12-19,ai api,1038
+2023,How We Built Our MCP Architecture,case_study,2024-07-01,ai api,1010
+2024,Automation and CI/CD,landing_page,2024-12-09,developer tools,1028
+2025,Case Study: Fortune 500 Migration,blog_post,2024-04-12,llm integration,1034
+2026,Enterprise Feature Announcement,blog_post,2024-09-28,ai api,1019
+2027,Performance Optimization Guide,blog_post,2024-10-13,developer tools,1046
+2028,Our Journey to SOC2 Compliance,blog_post,2024-09-12,ai api,1047
+2029,Monitoring and Observability,blog_post,2024-02-23,developer tools,1045
+2030,Technical Architecture Overview,tutorial,2024-10-23,ai api,1041
+2031,Building Developer Communities,changelog,2024-06-07,ai api,1045
+2032,Best Practices for AI Integration,documentation,2024-08-02,ai api,1004
+2033,Cost Optimization Strategies,blog_post,2024-07-20,enterprise ai,1004
+2034,Our Journey to SOC2 Compliance,documentation,2024-09-06,automation,1005
+2035,Security Best Practices,changelog,2024-08-28,developer tools,1005
+2036,Monitoring and Observability,documentation,2024-04-16,ai api,1008
+2037,Getting Started with Our API,landing_page,2024-04-12,automation,1028
+2038,API Design Principles We Follow,blog_post,2024-11-19,llm integration,1005
+2039,Kubernetes Deployment Guide,blog_post,2024-11-13,automation,1009
+2040,Data Privacy and GDPR,blog_post,2024-07-16,ai api,1000
+2041,Performance Optimization Guide,blog_post,2024-06-25,ai api,1039
+2042,Testing Strategies for Developers,blog_post,2024-08-20,cloud platform,1032
+2043,Customer Success Story: Startup,landing_page,2024-10-09,llm integration,1039
+2044,Getting Started with Our API,blog_post,2024-05-03,ai api,1007
+2045,Cost Optimization Strategies,case_study,2024-01-29,ai api,1022
+2046,Architecture Decision Records,case_study,2024-03-27,code generation,1026
+2047,Our Journey to SOC2 Compliance,documentation,2024-06-08,api platform,1004
+2048,Getting Started with Our API,documentation,2024-03-12,ai api,1037
+2049,Performance Optimization Guide,documentation,2024-05-12,code generation,1047
+2050,Architecture Decision Records,landing_page,2024-03-02,developer productivity,1021
+2051,Migrating from Competitors,case_study,2024-03-24,ai api,1004
+2052,Advanced Features Deep Dive,whitepaper,2024-06-17,developer tools,1008
+2053,Case Study: Fortune 500 Migration,blog_post,2024-12-24,llm integration,1006
+2054,Technical Architecture Overview,changelog,2024-09-08,ai api,1007
+2055,API Design Principles We Follow,blog_post,2024-06-09,ai api,1011
+2056,API Design Principles We Follow,documentation,2024-08-15,llm integration,1038
+2057,CLI Quick Start Tutorial,blog_post,2024-03-11,ai api,1014
+2058,Technical Architecture Overview,blog_post,2024-05-09,automation,1037
+2059,Architecture Decision Records,tutorial,2024-03-07,cloud platform,1010
+2060,Scaling to Millions of Requests,documentation,2024-10-29,ai api,1023
+2061,Our Journey to SOC2 Compliance,landing_page,2024-09-28,ai api,1034
+2062,Building Developer Communities,documentation,2024-06-10,ai api,1042
+2063,Scaling to Millions of Requests,documentation,2024-06-05,ai api,1015
+2064,Building Developer Communities,blog_post,2024-07-07,ai api,1027
+2065,Kubernetes Deployment Guide,documentation,2024-10-19,api platform,1036
+2066,Understanding Our Pricing Model,blog_post,2024-08-22,ai api,1015
+2067,Migrating from Competitors,tutorial,2024-12-31,saas api,1047
+2068,Performance Optimization Guide,blog_post,2024-12-25,llm integration,1011
+2069,Scaling to Millions of Requests,whitepaper,2024-10-10,llm integration,1039
+2070,Testing Strategies for Developers,blog_post,2024-12-12,ai api,1019
+2071,Testing Strategies for Developers,landing_page,2024-08-26,code generation,1000
+2072,Security Best Practices,documentation,2024-01-19,enterprise ai,1023
+2073,Migrating from Competitors,blog_post,2024-07-01,llm integration,1026
+2074,Open Source Contributions Guide,case_study,2024-05-18,code generation,1049
+2075,Data Privacy and GDPR,tutorial,2024-01-18,llm integration,1027
+2076,Technical Architecture Overview,case_study,2024-01-04,ai api,1048
+2077,Case Study: Fortune 500 Migration,changelog,2024-04-15,ai api,1024
+2078,Customer Success Story: Startup,changelog,2024-03-09,llm integration,1002
+2079,Automation and CI/CD,whitepaper,2024-09-30,ai api,1022
+2080,Technical Architecture Overview,tutorial,2024-03-09,automation,1011
+2081,Troubleshooting Common Issues,case_study,2024-05-02,ai api,1037
+2082,Our Journey to SOC2 Compliance,case_study,2024-06-21,llm integration,1007
+2083,Getting Started with Our API,landing_page,2024-08-16,ai api,1049
+2084,API Design Principles We Follow,case_study,2024-07-15,llm integration,1033
+2085,Weekly Product Updates,documentation,2024-11-18,ai api,1048
+2086,Testing Strategies for Developers,landing_page,2024-01-03,ai api,1029
+2087,How We Built Our MCP Architecture,blog_post,2024-09-10,cloud platform,1044
+2088,Enterprise Feature Announcement,landing_page,2024-09-09,ai api,1013
+2089,Getting Started with Our API,documentation,2024-08-18,ai api,1019
+2090,Our Journey to SOC2 Compliance,changelog,2024-02-27,cloud platform,1025
+2091,Team Collaboration Features,changelog,2024-03-21,ai api,1004
+2092,Team Collaboration Features,documentation,2024-05-12,ai api,1013
+2093,Customer Success Story: Startup,landing_page,2024-06-25,ai api,1013
+2094,Advanced Features Deep Dive,blog_post,2024-07-10,ai api,1035
+2095,Performance Optimization Guide,tutorial,2024-11-29,code generation,1032
+2096,Troubleshooting Common Issues,blog_post,2024-05-16,ai api,1005
+2097,Understanding Our Pricing Model,tutorial,2024-07-18,llm integration,1034
+2098,Enterprise Feature Announcement,blog_post,2024-05-31,ai api,1045
+2099,API Design Principles We Follow,blog_post,2024-09-01,developer tools,1010
+2100,Advanced Features Deep Dive,landing_page,2024-05-08,developer experience,1046
+2101,Case Study: Fortune 500 Migration,blog_post,2024-08-14,ai api,1022
+2102,CLI Quick Start Tutorial,blog_post,2024-05-03,developer tools,1017
+2103,Troubleshooting Common Issues,blog_post,2024-01-31,ai api,1046
+2104,Developer Productivity Tips,documentation,2024-10-27,ai api,1024
+2105,Technical Architecture Overview,tutorial,2024-07-12,llm integration,1009
+2106,Understanding Our Pricing Model,documentation,2024-07-12,ai api,1009
+2107,Cost Optimization Strategies,documentation,2024-06-29,developer productivity,1025
+2108,Testing Strategies for Developers,landing_page,2024-12-04,ai api,1011
+2109,How We Built Our MCP Architecture,tutorial,2024-04-06,ai api,1040
+2110,Our Journey to SOC2 Compliance,tutorial,2024-07-24,llm integration,1047
+2111,Weekly Product Updates,blog_post,2024-12-07,ai api,1045
+2112,Testing Strategies for Developers,changelog,2024-11-19,ai api,1034
+2113,Cost Optimization Strategies,tutorial,2024-07-26,ai api,1009
+2114,Cost Optimization Strategies,blog_post,2024-10-31,code generation,1017
+2115,Monitoring and Observability,blog_post,2024-01-05,cloud platform,1044
+2116,Understanding Our Pricing Model,blog_post,2024-06-19,llm integration,1022
+2117,Case Study: Fortune 500 Migration,case_study,2024-03-11,ai api,1041
+2118,Best Practices for AI Integration,blog_post,2024-11-19,api platform,1003
+2119,Kubernetes Deployment Guide,blog_post,2024-10-30,ai api,1023
+2120,Migrating from Competitors,landing_page,2024-12-16,ai api,1017
+2121,Team Collaboration Features,documentation,2024-05-25,ai api,1036
+2122,API Design Principles We Follow,case_study,2024-10-15,ai api,1005
+2123,Weekly Product Updates,blog_post,2024-06-27,api platform,1011
+2124,Weekly Product Updates,blog_post,2024-01-30,ai api,1037
+2125,Monitoring and Observability,documentation,2024-12-11,ai api,1033
+2126,Customer Success Story: Startup,documentation,2024-08-29,automation,1005
+2127,How We Built Our MCP Architecture,tutorial,2024-05-30,ai api,1009
+2128,CLI Quick Start Tutorial,landing_page,2024-10-07,cloud platform,1036
+2129,Enterprise Feature Announcement,landing_page,2024-01-01,ai api,1003
+2130,Data Privacy and GDPR,blog_post,2024-04-09,ai api,1023
+2131,Kubernetes Deployment Guide,landing_page,2024-06-08,ai api,1000
+2132,Performance Optimization Guide,blog_post,2024-09-24,code generation,1047
+2133,Advanced Features Deep Dive,documentation,2024-08-16,automation,1024
+2134,Technical Architecture Overview,changelog,2024-01-12,ai api,1022
+2135,Testing Strategies for Developers,whitepaper,2024-11-13,ai api,1009
+2136,Case Study: Fortune 500 Migration,documentation,2024-07-09,developer tools,1031
+2137,Scaling to Millions of Requests,blog_post,2024-09-13,llm integration,1040
+2138,Developer Productivity Tips,blog_post,2024-04-29,ai api,1024
+2139,Team Collaboration Features,landing_page,2024-06-06,ai api,1021
+2140,Best Practices for AI Integration,case_study,2024-09-22,ai api,1010
+2141,Technical Architecture Overview,landing_page,2024-05-28,llm integration,1011
+2142,How We Built Our MCP Architecture,blog_post,2024-10-19,code generation,1015
+2143,Performance Optimization Guide,tutorial,2024-12-06,ai api,1041
+2144,Architecture Decision Records,blog_post,2024-12-15,ai api,1027
+2145,Integration with Popular Tools,landing_page,2024-03-24,code generation,1035
+2146,Scaling to Millions of Requests,landing_page,2024-02-03,ai api,1041
+2147,Customer Success Story: Startup,landing_page,2024-08-10,ai api,1011
+2148,Migrating from Competitors,documentation,2024-01-17,llm integration,1001
+2149,Scaling to Millions of Requests,case_study,2024-08-11,ai api,1024

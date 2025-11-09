@@ -1,0 +1,51 @@
+campaign_id,campaign_name,campaign_type,channel,start_date,budget_usd,target_audience
+1000,GitHub Trending Push,partnership,organic_search,2024-02-11,1545,enterprises
+1001,Twitter Spaces,paid_ads,hackernews,2024-06-16,10549,security_engineers
+1002,Free Tier Launch,paid_ads,hackernews,2024-01-14,7297,enterprises
+1003,HackerNews Show HN,event,referral,2024-02-04,3341,developers
+1004,Annual User Conference,product_led,organic_search,2024-07-07,15639,startups
+1005,Integration Marketplace,paid_ads,organic_search,2024-12-22,3749,developers
+1006,Beta Program,seo,organic_search,2024-06-23,904,developers
+1007,Webinar Series Q1,paid_ads,discord,2024-04-21,2838,startups
+1008,HackerNews Show HN,seo,email,2024-01-28,4796,startups
+1009,Compliance Announcement,social,linkedin,2024-12-01,3896,enterprises
+1010,GitHub Trending Push,event,youtube,2024-05-05,2668,researchers
+1011,Platform Feature Launch,content,organic_search,2024-03-24,8198,enterprises
+1012,Slack Integration Launch,paid_ads,linkedin,2024-10-20,14063,enterprises
+1013,Open Source Advocacy,seo,organic_search,2024-08-18,19899,developers
+1014,YouTube Tutorial Series,content,organic_search,2024-08-25,3252,enterprises
+1015,Webinar Series Q1,paid_ads,discord,2024-07-07,14227,researchers
+1016,YouTube Tutorial Series,seo,organic_search,2024-01-28,3011,developers
+1017,Free Tier Launch,content,twitter,2024-01-07,35887,developers
+1018,VS Code Extension,event,organic_search,2024-03-31,5362,developers
+1019,VS Code Extension,content,organic_search,2024-05-19,2080,enterprises
+1020,Open Source Advocacy,paid_ads,youtube,2024-06-09,6118,data_scientists
+1021,Partner Co-Marketing,paid_ads,organic_search,2024-03-24,15739,developers
+1022,Pricing Revamp,event,twitter,2024-12-08,5877,developers
+1023,Valentine Developer Love,paid_ads,organic_search,2024-03-17,1103,enterprises
+1024,Pricing Revamp,seo,organic_search,2024-07-28,4556,devops
+1025,Back to School,seo,organic_search,2024-03-17,4811,researchers
+1026,Developer Relations Push,event,twitter,2024-04-07,3453,startups
+1027,Product Hunt Launch,paid_ads,github,2024-12-08,4192,developers
+1028,Security Certification,seo,reddit,2024-06-02,531,students
+1029,Year in Review,seo,organic_search,2024-10-06,1703,startups
+1030,VS Code Extension,paid_ads,organic_search,2024-04-28,1478,developers
+1031,Newsletter Growth,content,organic_search,2024-03-03,50000,students
+1032,Webinar Series Q1,product_led,organic_search,2024-04-21,7427,researchers
+1033,Valentine Developer Love,paid_ads,organic_search,2024-01-14,8424,developers
+1034,Platform Feature Launch,seo,reddit,2024-08-04,809,developers
+1035,Podcast Tour,content,twitter,2024-06-09,6842,developers
+1036,VS Code Extension,email,twitter,2024-12-08,1828,data_scientists
+1037,Referral Program Launch,social,organic_search,2024-05-26,2656,data_scientists
+1038,Black Friday Promo,social,twitter,2024-07-14,39483,developers
+1039,Partner Co-Marketing,paid_ads,youtube,2024-06-30,5316,data_scientists
+1040,Beta Program,seo,organic_search,2024-09-08,1937,researchers
+1041,Hackathon Sponsorship,product_led,organic_search,2024-03-17,19265,devops
+1042,Podcast Tour,product_led,organic_search,2024-03-24,8385,developers
+1043,Influencer Outreach,event,twitter,2024-02-18,1280,startups
+1044,Back to School,content,organic_search,2024-03-24,7983,developers
+1045,Podcast Tour,social,organic_search,2024-04-28,2089,developers
+1046,Pricing Revamp,seo,twitter,2024-03-10,2441,startups
+1047,YouTube Tutorial Series,paid_ads,linkedin,2024-10-20,13780,enterprises
+1048,Free Tier Launch,event,organic_search,2024-11-24,13535,enterprises
+1049,CLI v2 Announcement,content,twitter,2024-11-24,6495,data_scientists

@@ -43,6 +43,10 @@ validation_report.json
 *_report.json
 *.metadata.json
 
+# Example data (exception to output rules)
+!marketing_example/
+!marketing_example/**
+
 # Environment & Secrets
 .env
 .env.local

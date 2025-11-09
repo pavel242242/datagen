@@ -1,0 +1,13 @@
+hackathon_id,name,event_date,location,expected_attendees,campaign_id
+500,HackMIT,2024-12-31,New York,50,1043
+501,AI Hackathon SF,2024-12-31,Virtual,50,1017
+502,HackIllinois,2024-09-30,Boston,50,1047
+503,Developer Days Berlin,2024-08-31,San Francisco,50,1015
+504,MHacks Michigan,2024-04-30,San Francisco,50,1019
+505,AngelHack Virtual,2024-09-30,Austin,50,1025
+506,HackMIT,2024-03-31,Berlin,50,1026
+507,MHacks Michigan,2024-06-30,Boston,50,1015
+508,HackMIT,2024-09-30,Austin,50,1037
+509,HackMIT,2024-07-31,Berlin,50,1015
+510,ETHGlobal,2024-04-30,New York,50,1017
+511,LA Hacks,2024-11-30,Boston,50,1047
