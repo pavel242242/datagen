@@ -112,6 +112,23 @@ def apply_modifiers(
                 args.get("magnitude_dist", {"type": "lognormal", "params": {"mean": 0, "sigma": 0.5}})
             )
 
+        elif transform == "trend":
+            if context is None:
+                logger.warning("Trend modifier requires context, skipping")
+            else:
+                # Get timestamp column reference
+                time_col = args.get("time_reference")
+                if time_col not in context.columns:
+                    logger.warning(f"Trend modifier time_reference '{time_col}' not found in context, skipping")
+                else:
+                    result = modify_trend(
+                        result,
+                        context[time_col],
+                        args["type"],
+                        args.get("growth_rate"),
+                        args.get("params", {})
+                    )
+
         else:
             logger.warning(f"Unknown modifier: {transform}, skipping")
 
@@ -241,6 +258,60 @@ def modify_seasonality(
         Scaled values
     """
     multipliers = get_seasonality_multiplier(timestamps, dimension, weights)
+    return values * multipliers
+
+
+def modify_trend(
+    values: np.ndarray,
+    timestamps: pd.Series,
+    trend_type: str,
+    growth_rate: Optional[float] = None,
+    params: Optional[dict] = None
+) -> np.ndarray:
+    """
+    Apply time-based trend (growth or decay) to values.
+
+    Args:
+        values: Numeric values to scale
+        timestamps: Timestamps for trend calculation
+        trend_type: "exponential", "linear", or "logarithmic"
+        growth_rate: Annual growth rate (e.g., 0.08 for 8% growth) for exponential/linear
+        params: Additional parameters for specific trend types
+
+    Returns:
+        Values with trend applied
+    """
+    timestamps = pd.to_datetime(timestamps)
+
+    # Calculate time delta from start (in years for growth rate)
+    start_time = timestamps.min()
+    time_delta_days = (timestamps - start_time).dt.total_seconds() / (24 * 3600)
+    time_delta_years = time_delta_days / 365.25
+
+    if trend_type == "exponential":
+        # Exponential growth: value * (1 + growth_rate) ^ t
+        if growth_rate is None:
+            raise ValueError("exponential trend requires growth_rate")
+        multipliers = np.power(1 + growth_rate, time_delta_years)
+
+    elif trend_type == "linear":
+        # Linear growth: value * (1 + growth_rate * t)
+        if growth_rate is None:
+            raise ValueError("linear trend requires growth_rate")
+        multipliers = 1 + growth_rate * time_delta_years
+
+    elif trend_type == "logarithmic":
+        # Logarithmic growth: value * (1 + a * log(1 + b * t))
+        # Default params: a=0.1, b=1.0
+        if params is None:
+            params = {}
+        a = params.get("a", 0.1)
+        b = params.get("b", 1.0)
+        multipliers = 1 + a * np.log(1 + b * time_delta_years)
+
+    else:
+        raise ValueError(f"Unknown trend type: {trend_type}. Must be 'exponential', 'linear', or 'logarithmic'")
+
     return values * multipliers
 
 
