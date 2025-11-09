@@ -242,11 +242,39 @@ class DatasetExecutor:
                 node, fanout_counts, all_parents_df
             )
 
+        # Apply segment-based fanout multipliers from ANY parent with segment_behavior
+        for parent_id in node.parents:
+            if parent_id in self.generated_data:
+                p_node = self.nodes_by_id[parent_id]
+                p_df = self.generated_data[parent_id]
+                if p_node.segment_behavior:
+                    fanout_counts = self._apply_segment_multipliers_to_fanout(
+                        p_node, fanout_counts, p_df
+                    )
+
         total_rows = fanout_counts.sum()
         logger.debug(f"  Total fanout: {total_rows} child rows (mean={fanout_counts.mean():.2f})")
 
         # Build child row mapping
         parent_indices = np.repeat(np.arange(len(parent_df)), fanout_counts)
+
+        # Add parent segment to data if ANY parent has segment_behavior
+        parent_segment_column = None
+        parent_segment_values = None
+        parent_segment_node = None
+        for parent_id in node.parents:
+            if parent_id in self.generated_data:
+                p_node = self.nodes_by_id[parent_id]
+                p_df = self.generated_data[parent_id]
+                if p_node.segment_behavior:
+                    segment_config = p_node.segment_behavior
+                    segment_col_name = segment_config.get('segment_column')
+                    if segment_col_name and segment_col_name in p_df.columns:
+                        parent_segment_column = segment_col_name
+                        parent_segment_node = p_node
+                        # Create temporary column with parent's segment value for each child row
+                        parent_segment_values = p_df[segment_col_name].values[parent_indices]
+                        break  # Use first parent with segment_behavior
 
         # Generate columns
         data = {}
@@ -294,6 +322,22 @@ class DatasetExecutor:
 
             # Cast
             values = self._cast_to_dtype(values, col.type, col.nullable)
+
+            # Apply segment-based value multipliers if applicable
+            if (parent_segment_column and
+                parent_segment_node and
+                parent_segment_node.segment_behavior and
+                col.type in ["int", "float"]):
+
+                segment_config = parent_segment_node.segment_behavior
+                applies_to = segment_config.get('applies_to_columns', [])
+
+                # Apply value multiplier if this column is in the applies_to list
+                if col.name in applies_to:
+                    behaviors = segment_config.get('behaviors', {})
+                    values = self._apply_segment_value_multipliers(
+                        values, parent_segment_values, behaviors
+                    )
 
             data[col.name] = values
 
@@ -461,6 +505,93 @@ class DatasetExecutor:
 
         # Round and convert back to int, ensuring non-negative
         return np.maximum(0, np.round(result_counts)).astype(int)
+
+    def _apply_segment_multipliers_to_fanout(
+        self,
+        parent_node: Node,
+        fanout_counts: np.ndarray,
+        parent_df: pd.DataFrame
+    ) -> np.ndarray:
+        """
+        Apply segment-based multipliers to fanout counts.
+
+        For each parent row, looks up its segment value and applies
+        the segment's fanout_multiplier from segment_behavior config.
+
+        Args:
+            parent_node: Parent node with segment_behavior config
+            fanout_counts: Array of fanout counts for each parent
+            parent_df: DataFrame of parent records
+
+        Returns:
+            Modified fanout counts with segment multipliers applied
+        """
+        segment_config = parent_node.segment_behavior
+        if not segment_config:
+            return fanout_counts
+
+        # Get segment column name
+        segment_column = segment_config.get('segment_column')
+        if not segment_column or segment_column not in parent_df.columns:
+            logger.warning(
+                f"Segment column '{segment_column}' not found in parent '{parent_node.id}', "
+                f"skipping segment multipliers"
+            )
+            return fanout_counts
+
+        # Get behavior definitions
+        behaviors = segment_config.get('behaviors', {})
+        if not behaviors:
+            logger.warning(
+                f"No behaviors defined in segment_behavior for '{parent_node.id}', "
+                f"skipping segment multipliers"
+            )
+            return fanout_counts
+
+        result_counts = fanout_counts.copy().astype(float)
+
+        # Apply multiplier for each parent based on its segment
+        for idx, segment_value in enumerate(parent_df[segment_column]):
+            segment_behavior = behaviors.get(segment_value, {})
+            fanout_multiplier = segment_behavior.get('fanout_multiplier', 1.0)
+            result_counts[idx] *= fanout_multiplier
+
+        logger.debug(
+            f"  Applied segment multipliers: mean fanout changed from "
+            f"{fanout_counts.mean():.2f} to {result_counts.mean():.2f}"
+        )
+
+        # Round and convert back to int, ensuring non-negative
+        return np.maximum(0, np.round(result_counts)).astype(int)
+
+    def _apply_segment_value_multipliers(
+        self,
+        values: np.ndarray,
+        parent_segments: np.ndarray,
+        behaviors: dict
+    ) -> np.ndarray:
+        """
+        Apply segment-based value multipliers to column values.
+
+        For each child row, looks up its parent's segment and applies
+        the segment's value_multiplier.
+
+        Args:
+            values: Array of column values to multiply
+            parent_segments: Array of parent segment values (one per child row)
+            behaviors: Dict mapping segment names to behavior configs
+
+        Returns:
+            Modified values with segment multipliers applied
+        """
+        result = values.copy().astype(float)
+
+        for idx, segment_value in enumerate(parent_segments):
+            segment_behavior = behaviors.get(segment_value, {})
+            value_multiplier = segment_behavior.get('value_multiplier', 1.0)
+            result[idx] *= value_multiplier
+
+        return result
 
     def _build_context_with_effects(self, data: dict, modifiers: list) -> pd.DataFrame:
         """

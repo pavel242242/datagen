@@ -47,8 +47,18 @@
 { "name": "country", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["US","UK","DE","FR","CZ","ES","IT","PL","NL"], "weights_kind": "uniform" } } },
 { "name": "full_name", "type": "string", "nullable": false, "generator": { "faker": { "method": "name", "locale_from": "country" } } },
 { "name": "email", "type": "string", "nullable": false, "generator": { "faker": { "method": "email" } } },
-{ "name": "created_at", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [0.9,0.95,1.0,1.05,1.2,1.15,0.85] } } } }
-]
+{ "name": "created_at", "type": "datetime", "nullable": false, "generator": { "datetime_series": { "within": "timeframe", "freq": "H", "pattern": { "dimension": "dow", "weights": [0.9,0.95,1.0,1.05,1.2,1.15,0.85] } } } },
+{ "name": "customer_segment", "type": "string", "nullable": false, "generator": { "choice": { "choices": ["VIP","Standard","Casual"], "weights": [0.15,0.50,0.35] } } }
+],
+"segment_behavior": {
+"segment_column": "customer_segment",
+"behaviors": {
+"VIP": { "fanout_multiplier": 4.0, "value_multiplier": 3.0 },
+"Standard": { "fanout_multiplier": 1.0, "value_multiplier": 1.0 },
+"Casual": { "fanout_multiplier": 0.4, "value_multiplier": 0.6 }
+},
+"applies_to_columns": ["gross_amount"]
+}
 },
 {
 "id": "campaign",

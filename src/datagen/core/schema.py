@@ -304,6 +304,7 @@ class Node(BaseModel):
     columns: list[Column]
     modifiers: Optional[list[ModifierSpec]] = None  # Table-level modifiers (e.g., effects)
     rows: Optional[int] = None  # For entities: override default row count
+    segment_behavior: Optional[dict] = None  # Behavioral segmentation config
 
     @model_validator(mode="after")
     def validate_node(self):
