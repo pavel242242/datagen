@@ -345,6 +345,66 @@ class DatasetExecutor:
             # Cast
             values = self._cast_to_dtype(values, col.type, col.nullable)
 
+            # Apply temporal constraints: fact timestamps must be >= parent created_at
+            if (
+                col.type in ["datetime", "date"]
+                and parent_vintage_node
+                and parent_vintage_node.vintage_behavior
+            ):
+                vintage_config = parent_vintage_node.vintage_behavior
+                created_at_col = vintage_config.get("created_at_column")
+
+                if created_at_col and created_at_col in parent_df.columns:
+                    # Get parent created_at timestamps for each child row
+                    parent_created_at = parent_df[created_at_col].values[parent_indices]
+
+                    # Convert to pandas Series for easier datetime handling
+                    values_series = pd.Series(values)
+                    parent_created_series = pd.Series(parent_created_at)
+
+                    # Ensure both are datetime
+                    if not pd.api.types.is_datetime64_any_dtype(values_series):
+                        values_series = pd.to_datetime(values_series)
+                    if not pd.api.types.is_datetime64_any_dtype(parent_created_series):
+                        parent_created_series = pd.to_datetime(parent_created_series)
+
+                    # Find violations (fact timestamp < parent created_at)
+                    violations = values_series < parent_created_series
+
+                    if violations.any():
+                        # Resample violated timestamps from [parent_created_at, timeframe.end]
+                        n_violations = violations.sum()
+                        logger.debug(
+                            f"  Fixing {n_violations} temporal violations in {node.id}.{col.name}"
+                        )
+
+                        # Use timeframe end as upper bound
+                        if self.dataset.timeframe:
+                            end_time = pd.to_datetime(self.dataset.timeframe.end)
+                        else:
+                            # Fallback to max of current values
+                            end_time = values_series.max()
+
+                        # Normalize timezone of end_time to match parent_created
+                        if hasattr(end_time, "tz") and end_time.tz is not None:
+                            end_time = end_time.tz_localize(None)
+
+                        # For each violation, sample uniformly between parent_created_at and end_time
+                        for idx in violations[violations].index:
+                            parent_created = parent_created_series.iloc[idx]
+                            # Random timestamp between parent_created and end_time
+                            time_range = (end_time - parent_created).total_seconds()
+                            if time_range > 0:
+                                random_offset = pd.Timedelta(
+                                    seconds=col_rng.uniform(0, time_range)
+                                )
+                                values_series.iloc[idx] = parent_created + random_offset
+                            else:
+                                # If parent_created >= end_time, just use parent_created
+                                values_series.iloc[idx] = parent_created
+
+                        values = values_series.values
+
             # Apply segment-based value multipliers if applicable
             if (
                 parent_segment_column

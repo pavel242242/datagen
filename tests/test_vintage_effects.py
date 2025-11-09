@@ -420,5 +420,127 @@ class TestValueMultipliers:
         assert 1510 <= result[2] <= 1520
 
 
-# Integration test would go here - test end-to-end with executor
+class TestTemporalConstraints:
+    """Test temporal constraint enforcement (purchase_time >= customer created_at)."""
+
+    def test_temporal_constraint_compliance(self):
+        """Test that fact timestamps are always >= parent created_at."""
+        import json
+        from datagen.core.schema import Dataset
+        from datagen.core.executor import DatasetExecutor
+
+        # Create a simple schema with vintage effects
+        schema_dict = {
+            "version": "1.0",
+            "metadata": {"name": "TemporalConstraintTest"},
+            "timeframe": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z",
+                "freq": "H",
+            },
+            "constraints": {
+                "foreign_keys": [
+                    {"from": "purchase.customer_id", "to": "customer.customer_id"}
+                ]
+            },
+            "nodes": [
+                {
+                    "id": "customer",
+                    "kind": "entity",
+                    "pk": "customer_id",
+                    "rows": 100,
+                    "columns": [
+                        {
+                            "name": "customer_id",
+                            "type": "int",
+                            "generator": {"sequence": {"start": 1, "step": 1}},
+                        },
+                        {
+                            "name": "created_at",
+                            "type": "datetime",
+                            "generator": {
+                                "datetime_series": {
+                                    "within": {
+                                        "start": "2024-01-01T00:00:00Z",
+                                        "end": "2024-12-31T23:59:59Z",
+                                    },
+                                    "freq": "D",
+                                }
+                            },
+                        },
+                    ],
+                    "vintage_behavior": {
+                        "created_at_column": "created_at",
+                        "age_based_multipliers": {
+                            "activity_decay": {
+                                "curve": [1.0, 0.75, 0.60, 0.50],
+                                "time_unit": "month",
+                                "applies_to": "fanout",
+                            }
+                        },
+                    },
+                },
+                {
+                    "id": "purchase",
+                    "kind": "fact",
+                    "pk": "purchase_id",
+                    "parents": ["customer"],
+                    "fanout": {"distribution": "poisson", "lambda": 5},
+                    "columns": [
+                        {
+                            "name": "purchase_id",
+                            "type": "int",
+                            "generator": {"sequence": {"start": 1, "step": 1}},
+                        },
+                        {
+                            "name": "customer_id",
+                            "type": "int",
+                            "generator": {"lookup": {"from": "customer.customer_id"}},
+                        },
+                        {
+                            "name": "purchase_time",
+                            "type": "datetime",
+                            "generator": {
+                                "datetime_series": {
+                                    "within": {
+                                        "start": "2024-01-01T00:00:00Z",
+                                        "end": "2024-12-31T23:59:59Z",
+                                    },
+                                    "freq": "H",
+                                }
+                            },
+                        },
+                    ],
+                },
+            ],
+        }
+
+        schema = Dataset(**schema_dict)
+        executor = DatasetExecutor(schema, master_seed=42)
+        tables = executor.execute(output_dir=None)
+
+        customer_df = tables["customer"]
+        purchase_df = tables["purchase"]
+
+        # Merge to get customer created_at for each purchase
+        merged = purchase_df.merge(
+            customer_df[["customer_id", "created_at"]],
+            on="customer_id",
+            suffixes=("", "_customer"),
+        )
+
+        # Check temporal constraint: ALL purchases must have purchase_time >= customer created_at
+        violations = merged[merged["purchase_time"] < merged["created_at"]]
+
+        # Assert 100% compliance
+        assert (
+            len(violations) == 0
+        ), f"Found {len(violations)} temporal violations (purchase_time < customer created_at)"
+
+        # Additional check: verify at least some purchases exist after customer creation
+        valid_purchases = merged[merged["purchase_time"] >= merged["created_at"]]
+        assert len(valid_purchases) > 0, "No valid purchases found"
+        assert len(valid_purchases) == len(
+            purchase_df
+        ), "All purchases should be valid (>= customer created_at)"
 # This will be added in a separate test file or integration test suite

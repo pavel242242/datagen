@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "SaaS Subscription Platform - Vintage Effects Demo",
+    "description": "Demonstrates vintage effects in SaaS context: subscriber retention decay and usage expansion over time",
+    "domain": "SaaS / Subscription Business",
+    "use_case": "Cohort retention analysis, expansion revenue tracking, product-led growth metrics"
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "session.subscriber_id", "to": "subscriber.subscriber_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "subscriber",
+      "kind": "entity",
+      "pk": "subscriber_id",
+      "rows": 600,
+      "columns": [
+        {
+          "name": "subscriber_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "signup_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        }
+      ],
+      "vintage_behavior": {
+        "created_at_column": "signup_date",
+        "age_based_multipliers": {
+          "retention_decay": {
+            "curve": [1.0, 0.85, 0.75, 0.65, 0.60, 0.55, 0.50, 0.48, 0.46, 0.45, 0.44, 0.43, 0.42],
+            "time_unit": "month",
+            "applies_to": "fanout"
+          },
+          "usage_expansion": {
+            "curve": {
+              "curve_type": "logarithmic",
+              "params": {"a": 1.0, "b": 0.25}
+            },
+            "time_unit": "month",
+            "applies_to": ["session_duration_minutes", "api_calls"]
+          }
+        }
+      }
+    },
+    {
+      "id": "session",
+      "kind": "fact",
+      "pk": "session_id",
+      "parents": ["subscriber"],
+      "fanout": {
+        "distribution": "poisson",
+        "lambda": 20
+      },
+      "columns": [
+        {
+          "name": "session_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "subscriber_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "subscriber.subscriber_id"}}
+        },
+        {
+          "name": "session_start",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "session_duration_minutes",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {
+                "mean": 2.5,
+                "sigma": 0.8
+              },
+              "clamp": [1.0, 120.0]
+            }
+          }
+        },
+        {
+          "name": "api_calls",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "poisson",
+              "params": {
+                "lambda": 50
+              },
+              "clamp": [0, 1000]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

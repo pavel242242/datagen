@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Healthcare Patient Appointments - Vintage Effects Demo",
+    "description": "Demonstrates vintage effects in healthcare: appointment frequency decay and treatment complexity growth",
+    "domain": "Healthcare / Patient Care",
+    "use_case": "Patient retention analysis, treatment progression tracking, chronic care management"
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "appointment.patient_id", "to": "patient.patient_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "patient",
+      "kind": "entity",
+      "pk": "patient_id",
+      "rows": 400,
+      "columns": [
+        {
+          "name": "patient_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 10000, "step": 1}}
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "generator": {"faker": {"method": "name"}}
+        },
+        {
+          "name": "admission_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        }
+      ],
+      "vintage_behavior": {
+        "created_at_column": "admission_date",
+        "age_based_multipliers": {
+          "visit_frequency_decay": {
+            "curve": {
+              "curve_type": "exponential",
+              "params": {"a": 1.0, "b": -0.05}
+            },
+            "time_unit": "month",
+            "applies_to": "fanout"
+          },
+          "treatment_complexity_growth": {
+            "curve": [1.0, 1.1, 1.25, 1.4, 1.5, 1.6, 1.65, 1.7],
+            "time_unit": "month",
+            "applies_to": ["procedure_count", "visit_duration_minutes"]
+          }
+        }
+      }
+    },
+    {
+      "id": "appointment",
+      "kind": "fact",
+      "pk": "appointment_id",
+      "parents": ["patient"],
+      "fanout": {
+        "distribution": "poisson",
+        "lambda": 8
+      },
+      "columns": [
+        {
+          "name": "appointment_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "patient_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "patient.patient_id"}}
+        },
+        {
+          "name": "appointment_datetime",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "visit_duration_minutes",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {
+                "mean": 30,
+                "sigma": 10
+              },
+              "clamp": [10, 90]
+            }
+          }
+        },
+        {
+          "name": "procedure_count",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "poisson",
+              "params": {
+                "lambda": 2
+              },
+              "clamp": [0, 20]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
