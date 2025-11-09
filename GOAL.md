@@ -40,10 +40,10 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 - Capability: Behavioral clusters with segment-specific multipliers
 - Validation: VIP segment shows 22 orders/customer vs Standard 21.6
 
-### ✅ Recently Completed: Feature #1 - Entity Vintage Effects (VALIDATED 2025-11-09)
+### ✅ SHIPPED: Feature #1 - Entity Vintage Effects (2025-11-09)
 
-**Status**: ✅ VALIDATED - Needs temporal fix before shipping (2-3h)
-**Effort**: 10 hours (implementation 8h + validation 2h vs estimated 12-16h)
+**Status**: ✅ SHIPPED - Phase 4 CRITICAL feature complete
+**Effort**: 12 hours total (implementation 8h + validation 2h + temporal fix 2h vs estimated 12-16h)
 **Impact**: CRITICAL - Enables cohort retention analysis, LTV, churn measurement
 
 **Problem Solved**: "All users signed up at once - can't measure true churn or cohort retention"
@@ -58,21 +58,24 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 **Implementation Complete**:
 - ✅ `src/datagen/core/vintage_utils.py` - 300 lines (age calc, curve evaluation)
 - ✅ `src/datagen/core/schema.py` - vintage_behavior field added
-- ✅ `src/datagen/core/executor.py` - Age multipliers integrated
-- ✅ `tests/test_vintage_effects.py` - 26 comprehensive tests (all passing)
-- ✅ `examples/vintage_effects_demo.json` - Demo schema
+- ✅ `src/datagen/core/executor.py` - Age multipliers + temporal constraint (lines 348-402)
+- ✅ `tests/test_vintage_effects.py` - 27 comprehensive tests (all passing)
+- ✅ 4 example schemas across domains:
+  - E-commerce: `examples/vintage_effects_demo.json`
+  - SaaS: `examples/saas_subscription_vintage.json`
+  - Healthcare: `examples/healthcare_appointments_vintage.json`
+  - Manufacturing: `examples/manufacturing_sensors_vintage.json`
 
-**Validation Complete** (3 parallel haiku agents):
+**Validation Complete** (3 parallel haiku agents + 4 domain tests):
 - ✅ VP Growth detected: "Early cohorts 10-20x more valuable" (19x LTV difference measured)
 - ✅ Head of Data detected: "75% engagement decay over customer lifetime"
 - ✅ Both analysts built cohort retention analyses unprompted
-- ⚠️ Critical issue: 64% temporal violations (purchase_time < customer created_at)
+- ✅ Temporal constraint fixed: 100% compliance (34,534 events, 0 violations)
+- ✅ Domain-agnostic design validated across SaaS, Healthcare, Manufacturing
 
-**Before Shipping**:
-- Fix temporal constraint in executor.py (2-3 hours)
-- Add multi-domain examples (SaaS, healthcare, manufacturing)
-
-**Full Report**: `BLIND_ANALYSIS_FINDINGS_FEATURE1.md`
+**Full Reports**:
+- `BLIND_ANALYSIS_FINDINGS_FEATURE1.md` (blind validation)
+- `docs/validation/feature-1-vintage-effects/` (agent reports)
 
 ---
 
