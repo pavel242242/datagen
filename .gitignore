@@ -38,6 +38,7 @@ htmlcov/
 # Output
 output/
 output_*/
+analysis_data/
 *.parquet
 validation_report.json
 *_report.json
