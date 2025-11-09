@@ -142,24 +142,10 @@
     }
   ],
   "constraints": {
-    "primary_keys": [
-      {
-        "table": "customer",
-        "column": "customer_id"
-      },
-      {
-        "table": "purchase",
-        "column": "purchase_id"
-      }
-    ],
     "foreign_keys": [
       {
-        "table": "purchase",
-        "column": "customer_id",
-        "references": {
-          "table": "customer",
-          "column": "customer_id"
-        }
+        "from": "purchase.customer_id",
+        "to": "customer.customer_id"
       }
     ]
   },

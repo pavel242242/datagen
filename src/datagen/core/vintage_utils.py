@@ -31,6 +31,18 @@ def calculate_entity_ages(
         >>> calculate_entity_ages(entity_created, fact_time, "month")
         array([2, 2])  # 2 months old, 2 months old
     """
+    # Normalize timezones - convert both to tz-naive to avoid mismatch errors
+    # Handle both Series (with .dt accessor) and DatetimeIndex
+    if hasattr(entity_created_at, "dt") and entity_created_at.dt.tz is not None:
+        entity_created_at = entity_created_at.dt.tz_localize(None)
+    elif hasattr(entity_created_at, "tz") and entity_created_at.tz is not None:
+        entity_created_at = entity_created_at.tz_localize(None)
+
+    if hasattr(reference_time, "dt") and reference_time.dt.tz is not None:
+        reference_time = reference_time.dt.tz_localize(None)
+    elif hasattr(reference_time, "tz") and reference_time.tz is not None:
+        reference_time = reference_time.tz_localize(None)
+
     # Calculate age in days first
     # When subtracting DatetimeIndex, we get TimedeltaIndex, not Series
     timedelta = reference_time - entity_created_at

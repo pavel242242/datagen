@@ -183,9 +183,9 @@
 
 ---
 
-#### ✅ Feature #1: Entity Vintage Effects (SHIPPED 2025-11-09)
-**Status**: ✅ Implemented & Testing
-**Effort**: ~8 hours (completed faster than estimated)
+#### ✅ Feature #1: Entity Vintage Effects (VALIDATED 2025-11-09)
+**Status**: ✅ VALIDATED - Needs temporal fix before shipping
+**Effort**: ~10 hours (implementation 8h + validation 2h)
 **Priority**: CRITICAL (Phase 4 completion)
 **Complexity**: High (affects core generation logic)
 
@@ -245,10 +245,33 @@
 - [x] Array-based curves supported
 - [x] Parametric curves (log, exp, linear) supported
 - [x] Tests confirm age-based differentiation (26 tests passing)
-- [ ] Blind analysis confirms cohort retention visible (NEXT)
-- [ ] Analyst can say "retention drops X% after Y months" (NEXT)
+- [x] Blind analysis confirms cohort retention visible (VP Growth: 19x LTV difference)
+- [x] Analyst can say "retention drops X% after Y months" (Head of Data: 75% decay)
+- [ ] Temporal constraint fix (purchase_time >= customer created_at) - REQUIRED
+- [ ] Multi-domain examples (SaaS, healthcare, manufacturing) - RECOMMENDED
 
-**Files to Modify**:
+**Validation Results** (Blind Analysis 2025-11-09):
+
+✅ **Feature Visibility**: Both analysts detected vintage effects unprompted
+- VP Growth: "Early cohorts are 10-20x more valuable than recent cohorts"
+- Head of Data: "Honeymoon Effect: 75% engagement decay over customer lifetime"
+
+✅ **Cohort Analysis Success**:
+- VP Growth built cohort LTV table: Q1 ($244) vs Q4 ($12.86) = 19x difference
+- Head of Data measured activity decay: 10.8 purchases (0-30 days) → 2.7 (180+ days)
+
+✅ **Activity Decay Curve Validated**:
+- Schema config: [1.0, 0.75, 0.60, 0.50, 0.45, 0.40, ...]
+- Observed decay: 75% from month 0 to month 6+ ≈ curve value 0.25
+
+⚠️ **Critical Issue Found**: 64% of purchases have timestamps before customer created_at
+- Root cause: Fact datetime_series doesn't constrain to >= parent created_at
+- Impact: Violates temporal logic, reduces realism
+- Fix: Add temporal constraint in executor.py (2-3 hours)
+
+📊 **Full Validation Report**: `BLIND_ANALYSIS_FINDINGS_FEATURE1.md`
+
+**Files Modified**:
 - `src/datagen/core/schema.py` - VintageBehavior Pydantic model
 - `src/datagen/core/executor.py` - Age calculation and multiplier application
 - `src/datagen/core/generators/primitives.py` - Fanout modifier support

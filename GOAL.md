@@ -40,20 +40,20 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 - Capability: Behavioral clusters with segment-specific multipliers
 - Validation: VIP segment shows 22 orders/customer vs Standard 21.6
 
-### ✅ Recently Completed: Feature #1 - Entity Vintage Effects (2025-11-09)
+### ✅ Recently Completed: Feature #1 - Entity Vintage Effects (VALIDATED 2025-11-09)
 
-**Status**: ✅ Implemented & Committed
-**Effort**: ~8 hours (completed faster than estimated 12-16h)
+**Status**: ✅ VALIDATED - Needs temporal fix before shipping (2-3h)
+**Effort**: 10 hours (implementation 8h + validation 2h vs estimated 12-16h)
 **Impact**: CRITICAL - Enables cohort retention analysis, LTV, churn measurement
 
 **Problem Solved**: "All users signed up at once - can't measure true churn or cohort retention"
 
 **What It Enables**:
-- Cohort-based retention analysis
-- Customer lifetime value (LTV) calculations
-- Realistic churn patterns over time
-- Age-based activity decay curves
-- Vintage analysis across any entity type
+- Cohort-based retention analysis ✅
+- Customer lifetime value (LTV) calculations ✅
+- Realistic churn patterns over time ✅
+- Age-based activity decay curves ✅
+- Vintage analysis across any entity type ✅
 
 **Implementation Complete**:
 - ✅ `src/datagen/core/vintage_utils.py` - 300 lines (age calc, curve evaluation)
@@ -62,7 +62,17 @@ We enable data engineers, scientists, and developers to create deterministic, mu
 - ✅ `tests/test_vintage_effects.py` - 26 comprehensive tests (all passing)
 - ✅ `examples/vintage_effects_demo.json` - Demo schema
 
-**Next**: Blind validation to verify cohort retention visible to analysts
+**Validation Complete** (3 parallel haiku agents):
+- ✅ VP Growth detected: "Early cohorts 10-20x more valuable" (19x LTV difference measured)
+- ✅ Head of Data detected: "75% engagement decay over customer lifetime"
+- ✅ Both analysts built cohort retention analyses unprompted
+- ⚠️ Critical issue: 64% temporal violations (purchase_time < customer created_at)
+
+**Before Shipping**:
+- Fix temporal constraint in executor.py (2-3 hours)
+- Add multi-domain examples (SaaS, healthcare, manufacturing)
+
+**Full Report**: `BLIND_ANALYSIS_FINDINGS_FEATURE1.md`
 
 ---
 
