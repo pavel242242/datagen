@@ -1,0 +1,136 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Marketing Attribution - Multi-Touch Journey",
+    "description": "Feature #5: Multi-touch attribution chains. Models customer journeys with multiple marketing touchpoints leading to conversions."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "purchase.customer_id", "to": "customer.customer_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "customer",
+      "kind": "entity",
+      "pk": "customer_id",
+      "rows": 500,
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "segment",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["high_intent", "medium_intent", "low_intent"],
+              "weights": [0.2, 0.5, 0.3]
+            }
+          }
+        },
+        {
+          "name": "signed_up_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "freq": "D"
+            }
+          }
+        }
+      ],
+      "segment_behavior": {
+        "high_intent": {
+          "fanout_multiplier": 2.5,
+          "value_multiplier": 3.0
+        },
+        "medium_intent": {
+          "fanout_multiplier": 1.0,
+          "value_multiplier": 1.0
+        },
+        "low_intent": {
+          "fanout_multiplier": 0.4,
+          "value_multiplier": 0.6
+        }
+      }
+    },
+    {
+      "id": "purchase",
+      "kind": "fact",
+      "pk": "purchase_id",
+      "parents": ["customer"],
+      "fanout": {"distribution": "poisson", "lambda": 3.0},
+      "attribution_chain": {
+        "channels": ["organic_search", "paid_search", "social_media", "email_campaign", "display_ad", "referral", "direct"],
+        "min_touches": 1,
+        "max_touches": 6,
+        "time_window_days": 45,
+        "attribution_model": "time_decay",
+        "time_decay_halflife_days": 14,
+        "touchpoint_table_name": "marketing_touchpoint"
+      },
+      "columns": [
+        {
+          "name": "purchase_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "customer.customer_id"}}
+        },
+        {
+          "name": "purchase_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {"mu": 4.5, "sigma": 0.8},
+              "clamp": [10, 5000]
+            }
+          },
+          "modifiers": [
+            {
+              "transform": "jitter",
+              "args": {"std": 0.05, "mode": "add"}
+            }
+          ]
+        },
+        {
+          "name": "product_category",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["electronics", "clothing", "home_goods", "books", "sports"],
+              "weights": [0.3, 0.25, 0.2, 0.15, 0.1]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

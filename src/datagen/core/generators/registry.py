@@ -212,6 +212,9 @@ class GeneratorRegistry:
             # For vocab nodes, just return the values
             return np.array(spec["enum_list"]["values"])
 
+        elif gen_type == "diffusion_curve":
+            return self._gen_diffusion_curve(spec["diffusion_curve"], size, rng, timeframe)
+
         else:
             raise ValueError(f"Unknown generator type: {gen_type}")
 
@@ -219,7 +222,7 @@ class GeneratorRegistry:
         """Extract generator type from spec."""
         valid_types = {
             "sequence", "choice", "distribution", "datetime_series",
-            "faker", "lookup", "expression", "enum_list"
+            "faker", "lookup", "expression", "enum_list", "diffusion_curve"
         }
         gen_types = set(spec.keys()) & valid_types
         if len(gen_types) != 1:
@@ -288,6 +291,45 @@ class GeneratorRegistry:
         else:
             # No patterns
             return generate_datetime_series(start, end, freq, size, rng)
+
+    def _gen_diffusion_curve(
+        self,
+        spec: dict,
+        size: int,
+        rng: np.random.Generator,
+        timeframe: Optional[dict]
+    ) -> pd.Series:
+        """Generate timestamps following a diffusion curve (Feature #6)."""
+        from .diffusion import generate_diffusion_timestamps
+
+        # Get time window
+        within = spec.get("within", "timeframe")
+
+        if within == "timeframe":
+            if timeframe is None:
+                raise ValueError("diffusion_curve requires timeframe when within='timeframe'")
+            start = pd.Timestamp(timeframe["start"])
+            end = pd.Timestamp(timeframe["end"])
+        elif isinstance(within, dict):
+            start = pd.Timestamp(within["start"])
+            end = pd.Timestamp(within["end"])
+        else:
+            raise ValueError(f"Invalid 'within' value: {within}")
+
+        # Get curve parameters
+        curve_type = spec.get("curve_type", "logistic")
+        inflection_point = spec.get("inflection_point", 0.5)
+        steepness = spec.get("steepness", 10.0)
+
+        return generate_diffusion_timestamps(
+            n_rows=size,
+            start_time=start,
+            end_time=end,
+            curve_type=curve_type,
+            inflection_point=inflection_point,
+            steepness=steepness,
+            rng=rng
+        )
 
     def _gen_faker(
         self,

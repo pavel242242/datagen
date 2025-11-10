@@ -231,6 +231,10 @@ class DatasetExecutor:
         if node.state_transition_model:
             return self._generate_fact_with_state_transitions(node, parent_df, parent_node)
 
+        # Check if this uses attribution chains (Feature #5)
+        if node.attribution_chain:
+            return self._generate_fact_with_attribution_chain(node, parent_df, parent_node)
+
         # Sample fanout for each parent row
         if node.fanout:
             fanout_counts = self._sample_fanout(node, len(parent_df))
@@ -758,6 +762,113 @@ class DatasetExecutor:
 
         df = pd.DataFrame(data)
         return df
+
+    def _generate_fact_with_attribution_chain(
+        self,
+        node: Node,
+        parent_df: pd.DataFrame,
+        parent_node: Node
+    ) -> pd.DataFrame:
+        """
+        Generate fact table with attribution chains (Feature #5).
+
+        Generates conversion events, then creates attribution touchpoints
+        referencing those conversions with attribution weights.
+        """
+        logger.debug(f"  Using attribution chain for '{node.id}'")
+
+        from .attribution_chain_utils import generate_attribution_chains
+
+        # First, generate the conversion events normally
+        # Use standard fanout logic
+        if node.fanout:
+            fanout_counts = self._sample_fanout(node, len(parent_df))
+        else:
+            fanout_counts = np.ones(len(parent_df), dtype=int)
+
+        # Build child dataframe
+        n_rows = fanout_counts.sum()
+        data = {}
+
+        # Get RNG for this node
+        node_rng = self.seed_manager.node_rng(node.id)
+
+        # Generate columns
+        for col in node.columns:
+            col_rng = self.seed_manager.column_rng(node.id, col.name)
+
+            # PK column
+            if col.name == node.pk:
+                data[col.name] = np.arange(1, n_rows + 1)
+                continue
+
+            # Parent FK column
+            if col.name.endswith("_id") and parent_node:
+                parent_ids = np.repeat(parent_df[parent_node.pk].values, fanout_counts)
+                data[col.name] = parent_ids
+                continue
+
+            # Generate column values
+            values = self.registry.generate(
+                col.generator,
+                n_rows,
+                col_rng,
+                timeframe=self.dataset.timeframe
+            )
+
+            # Apply modifiers
+            if col.modifiers:
+                context_df = pd.DataFrame(data)
+                values = apply_modifiers(
+                    pd.Series(values),
+                    col.modifiers,
+                    col_rng,
+                    context_df
+                )
+
+            data[col.name] = values
+
+        conversion_df = pd.DataFrame(data)
+
+        # Generate attribution touchpoints
+        config = node.attribution_chain
+        touchpoint_channels = config.get("channels", ["organic", "paid_search", "social", "email", "referral"])
+        min_touches = config.get("min_touches", 1)
+        max_touches = config.get("max_touches", 5)
+        time_window_days = config.get("time_window_days", 30)
+        attribution_model = config.get("attribution_model", "linear")
+        time_decay_halflife = config.get("time_decay_halflife_days")
+
+        # Find conversion timestamp column
+        timestamp_col = None
+        for col_name in conversion_df.columns:
+            if pd.api.types.is_datetime64_any_dtype(conversion_df[col_name]):
+                timestamp_col = col_name
+                break
+
+        if not timestamp_col:
+            raise ValueError(f"No timestamp column found in conversion table '{node.id}'")
+
+        # Generate attribution chains
+        touchpoints_df = generate_attribution_chains(
+            conversion_df=conversion_df,
+            conversion_id_col=node.pk,
+            conversion_time_col=timestamp_col,
+            touchpoint_channels=touchpoint_channels,
+            min_touches=min_touches,
+            max_touches=max_touches,
+            time_window_days=time_window_days,
+            attribution_model=attribution_model,
+            time_decay_halflife_days=time_decay_halflife,
+            rng=node_rng
+        )
+
+        # Store touchpoints as a separate table
+        touchpoint_table_name = config.get("touchpoint_table_name", f"{node.id}_touchpoints")
+        self.generated_data[touchpoint_table_name] = touchpoints_df
+        logger.info(f"  {touchpoint_table_name}: {len(touchpoints_df)} rows, {len(touchpoints_df.columns)} columns")
+
+        return conversion_df
 
     def _sample_fanout(self, node: Node, n_parents: int) -> np.ndarray:
         """Sample fanout counts for parents."""

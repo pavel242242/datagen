@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Product Adoption Diffusion",
+    "description": "Feature #6: Diffusion and adoption curves. Models Rogers diffusion of innovations with S-curve adoption patterns."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "D"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "user_feature.user_id", "to": "user.user_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "user",
+      "kind": "entity",
+      "pk": "user_id",
+      "rows": 1000,
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "joined_at",
+          "type": "datetime",
+          "generator": {
+            "diffusion_curve": {
+              "within": "timeframe",
+              "curve_type": "logistic",
+              "inflection_point": 0.4,
+              "steepness": 12.0
+            }
+          },
+          "constraints": {
+            "comment": "Users adopt product following S-curve: slow start, rapid middle, slow end"
+          }
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["US", "UK", "CA", "AU", "DE"],
+              "weights": [0.5, 0.2, 0.15, 0.1, 0.05]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "user_feature",
+      "kind": "fact",
+      "pk": "adoption_id",
+      "parents": ["user"],
+      "fanout": {"distribution": "poisson", "lambda": 2.5},
+      "columns": [
+        {
+          "name": "adoption_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "user.user_id"}}
+        },
+        {
+          "name": "feature_name",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["advanced_search", "collaboration", "api_access", "analytics_dashboard", "mobile_app"],
+              "weights": [0.3, 0.25, 0.2, 0.15, 0.1]
+            }
+          }
+        },
+        {
+          "name": "adopted_at",
+          "type": "datetime",
+          "generator": {
+            "diffusion_curve": {
+              "within": "timeframe",
+              "curve_type": "logistic",
+              "inflection_point": 0.55,
+              "steepness": 8.0
+            }
+          },
+          "constraints": {
+            "comment": "Feature adoption follows slower S-curve (inflection at 55%, less steep)"
+          }
+        },
+        {
+          "name": "usage_frequency",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["daily", "weekly", "monthly", "rarely"],
+              "weights": [0.2, 0.35, 0.3, 0.15]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

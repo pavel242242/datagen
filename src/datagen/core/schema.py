@@ -297,6 +297,7 @@ class Column(BaseModel):
             "lookup",
             "expression",
             "enum_list",
+            "diffusion_curve",
         }
         gen_keys = set(v.keys()) & valid_keys
 
@@ -343,6 +344,7 @@ class Node(BaseModel):
     vintage_behavior: Optional[dict] = None  # Age-based behavior config (Feature #1)
     stage_config: Optional[dict] = None  # Multi-stage process config (Feature #3)
     state_transition_model: Optional[dict] = None  # State transition config (Feature #4)
+    attribution_chain: Optional[dict] = None  # Multi-touch attribution config (Feature #5)
 
     @model_validator(mode="after")
     def validate_node(self):
