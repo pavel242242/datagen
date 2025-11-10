@@ -4,7 +4,72 @@
 
 ## Overview
 
-The LLM integration enables natural language schema generation using Claude. Users can describe their dataset in plain English, and the system automatically generates a valid JSON schema with validation loop and auto-repair.
+LLM integration enables natural language schema generation in **two ways**:
+
+### 🌟 Primary: Conversational Template (Recommended)
+Copy/paste a prompt into ChatGPT/Claude/GPT-5 and have a **natural conversation** about your dataset. The LLM asks clarifying questions and outputs valid JSON. **No API keys needed!**
+
+### ⚙️ Optional: Programmatic API
+For automation workflows, use the CLI/Python API with Anthropic API key for headless schema generation.
+
+---
+
+## Conversational Template (Primary Method)
+
+### How It Works
+
+1. **Copy the prompt** from [`SCHEMA_GENERATION_PROMPT.md`](SCHEMA_GENERATION_PROMPT.md)
+2. **Open ChatGPT, Claude, or GPT-5** (web interface - no API key!)
+3. **Paste the entire prompt** to start a new conversation
+4. **Describe your dataset** naturally: "I need e-commerce tracking"
+5. **LLM asks clarifying questions**: "How many users? Time period?"
+6. **Answer naturally**: "500 users, Jan-Dec 2024"
+7. **Get valid JSON** ready to save and use
+8. **Run**: `datagen generate schema.json --seed 42`
+
+### Why This Approach?
+
+✅ **No API keys needed** - Use free ChatGPT/Claude web interface
+✅ **Human-in-the-loop** - Clarify ambiguities through conversation
+✅ **Natural language** - No need to learn DSL syntax
+✅ **Iterative refinement** - Ask for changes: "Add a status field"
+✅ **Educational** - Learn the DSL through examples
+
+### Example Conversation
+
+See [`EXAMPLE_CONVERSATION.md`](EXAMPLE_CONVERSATION.md) for full examples.
+
+**Quick example:**
+
+```
+You: I need SaaS subscription tracking
+
+LLM: Great! A few questions:
+     1. How many users and subscription plans?
+     2. Should there be state transitions?
+     3. Time period?
+
+You: 200 users, 3 plans, track state changes, Jan-Dec 2024
+
+LLM: [Outputs complete JSON schema with users, plans, subscriptions, and payments]
+```
+
+### The Prompt Template
+
+The prompt in [`SCHEMA_GENERATION_PROMPT.md`](SCHEMA_GENERATION_PROMPT.md) includes:
+
+- **Role definition**: "You are an expert data architect..."
+- **Conversation guidelines**: Ask 2-3 questions before generating
+- **Complete DSL specification**: All generator types, modifiers, structure rules
+- **Examples**: Mini-schema showing best practices
+- **Output format**: JSON-only, no markdown
+- **Validation reminders**: Foreign keys, UTC format, etc.
+
+---
+
+## Programmatic API (Optional)
+
+For automation, CI/CD, or headless workflows:
 
 ## Features
 

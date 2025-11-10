@@ -53,6 +53,42 @@ pip install -e ".[keboola]"
 pip install -e ".[dev]"
 ```
 
+### Create a Schema (Two Options)
+
+#### Option 1: Conversational LLM (Recommended) 💬
+
+**No API keys needed! Use any LLM (ChatGPT, Claude, GPT-5):**
+
+1. **Copy the prompt** from [`SCHEMA_GENERATION_PROMPT.md`](SCHEMA_GENERATION_PROMPT.md)
+2. **Paste into ChatGPT/Claude** (web interface, no API key)
+3. **Chat about your dataset needs**: "I need e-commerce with users, products, orders"
+4. **LLM asks clarifying questions** and generates valid JSON
+5. **Copy the JSON** and save to a file
+6. **Generate data**: `datagen generate schema.json`
+
+**Example conversation:**
+- You: "I need SaaS subscription tracking"
+- LLM: "How many users? What events?"
+- You: "200 users, track subscription state changes and payments"
+- LLM: *[Outputs complete valid JSON schema]*
+
+See [`EXAMPLE_CONVERSATION.md`](EXAMPLE_CONVERSATION.md) for full examples.
+
+#### Option 2: Use Example Schemas
+
+Browse [`examples/`](examples/) for ready-to-use schemas:
+
+```bash
+# E-commerce
+datagen generate examples/llm_generated_ecommerce.json
+
+# SaaS analytics (comprehensive)
+datagen generate examples/comprehensive_saas_analytics.json
+
+# Healthcare appointments
+datagen generate examples/healthcare_appointments_vintage.json
+```
+
 ### Generate Your First Dataset
 
 ```bash
