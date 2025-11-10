@@ -1,0 +1,13 @@
+user_id,email,country,joined_at,features_adopted,daily_features,weekly_features,daily_use_pct
+280,jake79@example.net,US,2024-07-08 23:06:40.063163274,5,2,4,40.0
+840,williamsonphillip@example.com,US,2024-05-09 05:35:20.156966530,5,2,1,40.0
+271,sally68@example.org,CA,2024-06-15 06:58:34.588591522,4,3,1,75.0
+370,xramirez@example.org,CA,2024-05-19 12:11:44.073644394,4,3,3,75.0
+220,washingtonkatherine@example.net,UK,2024-06-14 19:21:36.816149654,4,2,2,50.0
+256,xmoore@example.com,CA,2024-04-10 02:46:01.959235949,4,2,1,50.0
+381,kbrown@example.org,UK,2024-06-22 10:30:00.396081928,4,2,2,50.0
+556,aharris@example.com,CA,2024-04-12 08:38:23.210771892,4,2,3,50.0
+707,brittany47@example.org,DE,2024-04-29 08:27:12.843487718,4,2,1,50.0
+758,umyers@example.net,US,2024-06-16 08:17:51.592622140,4,2,0,50.0
+825,ysheppard@example.org,US,2024-06-09 17:47:04.566613832,4,2,0,50.0
+834,vanessanguyen@example.org,UK,2024-03-28 16:45:55.883363080,4,2,0,50.0

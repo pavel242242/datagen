@@ -1,0 +1,169 @@
+{
+  "tier_comparison": [
+    {
+      "tier": "team",
+      "total_accounts": 146,
+      "avg_sessions_per_account": 11.7,
+      "avg_total_duration_min": 185.0,
+      "avg_total_actions": 93.7,
+      "engagement_5plus_pct": 99.3
+    },
+    {
+      "tier": "individual",
+      "total_accounts": 304,
+      "avg_sessions_per_account": 11.6,
+      "avg_total_duration_min": 190.6,
+      "avg_total_actions": 92.9,
+      "engagement_5plus_pct": 99.7
+    },
+    {
+      "tier": "enterprise",
+      "total_accounts": 50,
+      "avg_sessions_per_account": 11.2,
+      "avg_total_duration_min": 187.1,
+      "avg_total_actions": 89.4,
+      "engagement_5plus_pct": 98.0
+    }
+  ],
+  "day7_30_90_latest_cohort": [
+    {
+      "tier": "enterprise",
+      "cohort_size": 4,
+      "day7_retention_pct": 25.0,
+      "day30_retention_pct": 100.0,
+      "day90_retention_pct": 100.0
+    },
+    {
+      "tier": "individual",
+      "cohort_size": 11,
+      "day7_retention_pct": 54.5,
+      "day30_retention_pct": 81.8,
+      "day90_retention_pct": 100.0
+    },
+    {
+      "tier": "team",
+      "cohort_size": 8,
+      "day7_retention_pct": 50.0,
+      "day30_retention_pct": 100.0,
+      "day90_retention_pct": 100.0
+    }
+  ],
+  "churn_status": [
+    {
+      "tier": "enterprise",
+      "status": "Active",
+      "count": 9,
+      "pct": 18.0
+    },
+    {
+      "tier": "enterprise",
+      "status": "Disengaging",
+      "count": 18,
+      "pct": 36.0
+    },
+    {
+      "tier": "enterprise",
+      "status": "At Risk",
+      "count": 10,
+      "pct": 20.0
+    },
+    {
+      "tier": "enterprise",
+      "status": "Churned",
+      "count": 13,
+      "pct": 26.0
+    },
+    {
+      "tier": "individual",
+      "status": "Active",
+      "count": 59,
+      "pct": 19.4
+    },
+    {
+      "tier": "individual",
+      "status": "Disengaging",
+      "count": 108,
+      "pct": 35.5
+    },
+    {
+      "tier": "individual",
+      "status": "At Risk",
+      "count": 69,
+      "pct": 22.7
+    },
+    {
+      "tier": "individual",
+      "status": "Churned",
+      "count": 68,
+      "pct": 22.4
+    },
+    {
+      "tier": "team",
+      "status": "Active",
+      "count": 25,
+      "pct": 17.1
+    },
+    {
+      "tier": "team",
+      "status": "Disengaging",
+      "count": 60,
+      "pct": 41.1
+    },
+    {
+      "tier": "team",
+      "status": "At Risk",
+      "count": 37,
+      "pct": 25.3
+    },
+    {
+      "tier": "team",
+      "status": "Churned",
+      "count": 24,
+      "pct": 16.4
+    }
+  ],
+  "cohort_age_comparison": [
+    {
+      "cohort_age": "Older (2023)",
+      "tier": "enterprise",
+      "accounts": 33,
+      "avg_sessions": 10.6,
+      "engagement_5plus_pct": 97.0
+    },
+    {
+      "cohort_age": "Older (2023)",
+      "tier": "individual",
+      "accounts": 203,
+      "avg_sessions": 11.4,
+      "engagement_5plus_pct": 99.5
+    },
+    {
+      "cohort_age": "Older (2023)",
+      "tier": "team",
+      "accounts": 87,
+      "avg_sessions": 11.9,
+      "engagement_5plus_pct": 100.0
+    },
+    {
+      "cohort_age": "Newer (2024)",
+      "tier": "enterprise",
+      "accounts": 17,
+      "avg_sessions": 12.2,
+      "engagement_5plus_pct": 100.0
+    },
+    {
+      "cohort_age": "Newer (2024)",
+      "tier": "individual",
+      "accounts": 101,
+      "avg_sessions": 12.1,
+      "engagement_5plus_pct": 100.0
+    },
+    {
+      "cohort_age": "Newer (2024)",
+      "tier": "team",
+      "accounts": 59,
+      "avg_sessions": 11.5,
+      "engagement_5plus_pct": 98.3
+    }
+  ]
+}
