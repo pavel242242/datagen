@@ -1,0 +1,250 @@
+{
+  "saas": {
+    "funnel": {
+      "stages": [
+        {
+          "stage": "account_created",
+          "unique_users": 500
+        },
+        {
+          "stage": "email_verified",
+          "unique_users": 407
+        },
+        {
+          "stage": "first_login",
+          "unique_users": 363
+        },
+        {
+          "stage": "profile_completed",
+          "unique_users": 263
+        },
+        {
+          "stage": "first_action",
+          "unique_users": 210
+        },
+        {
+          "stage": "invited_teammate",
+          "unique_users": 108
+        },
+        {
+          "stage": "activated",
+          "unique_users": 98
+        }
+      ],
+      "overall_conversion": 19.6
+    },
+    "segments": {
+      "segments": [
+        {
+          "segment": "enterprise",
+          "total_users": 50,
+          "converted_users": 28,
+          "conversion_rate": 56.0
+        },
+        {
+          "segment": "team",
+          "total_users": 146,
+          "converted_users": 45,
+          "conversion_rate": 30.8
+        },
+        {
+          "segment": "individual",
+          "total_users": 304,
+          "converted_users": 25,
+          "conversion_rate": 8.2
+        }
+      ],
+      "final_stage": "activated"
+    },
+    "temporal": {
+      "violations": 0,
+      "status": "PASS"
+    }
+  },
+  "healthcare": {
+    "funnel": {
+      "stages": [
+        {
+          "stage": "initial_contact",
+          "unique_users": 800
+        },
+        {
+          "stage": "screening",
+          "unique_users": 693
+        },
+        {
+          "stage": "diagnosis",
+          "unique_users": 619
+        },
+        {
+          "stage": "treatment_plan",
+          "unique_users": 515
+        },
+        {
+          "stage": "treatment_started",
+          "unique_users": 464
+        },
+        {
+          "stage": "follow_up",
+          "unique_users": 335
+        }
+      ],
+      "overall_conversion": 41.875
+    },
+    "segments": {
+      "segments": [
+        {
+          "segment": "high_risk",
+          "total_users": 126,
+          "converted_users": 102,
+          "conversion_rate": 81.0
+        },
+        {
+          "segment": "medium_risk",
+          "total_users": 367,
+          "converted_users": 159,
+          "conversion_rate": 43.3
+        },
+        {
+          "segment": "low_risk",
+          "total_users": 307,
+          "converted_users": 74,
+          "conversion_rate": 24.1
+        }
+      ],
+      "final_stage": "follow_up"
+    },
+    "temporal": {
+      "violations": 0,
+      "status": "PASS"
+    }
+  },
+  "ecommerce": {
+    "funnel": {
+      "stages": [
+        {
+          "stage": "signup",
+          "unique_users": 1000
+        },
+        {
+          "stage": "browsing",
+          "unique_users": 708
+        },
+        {
+          "stage": "add_to_cart",
+          "unique_users": 327
+        },
+        {
+          "stage": "checkout",
+          "unique_users": 268
+        },
+        {
+          "stage": "purchase",
+          "unique_users": 238
+        }
+      ],
+      "overall_conversion": 23.799999999999997
+    },
+    "segments": {
+      "segments": [
+        {
+          "segment": "high_intent",
+          "total_users": 141,
+          "converted_users": 98,
+          "conversion_rate": 69.5
+        },
+        {
+          "segment": "medium_intent",
+          "total_users": 559,
+          "converted_users": 129,
+          "conversion_rate": 23.1
+        },
+        {
+          "segment": "low_intent",
+          "total_users": 300,
+          "converted_users": 11,
+          "conversion_rate": 3.7
+        }
+      ],
+      "final_stage": "purchase"
+    },
+    "temporal": {
+      "violations": 0,
+      "status": "PASS"
+    }
+  },
+  "growth_marketing": {
+    "funnel": {
+      "stages": [
+        {
+          "stage": "ad_impression",
+          "unique_users": 1200
+        },
+        {
+          "stage": "ad_click",
+          "unique_users": 179
+        },
+        {
+          "stage": "landing_page_view",
+          "unique_users": 175
+        },
+        {
+          "stage": "signup_started",
+          "unique_users": 94
+        },
+        {
+          "stage": "signup_completed",
+          "unique_users": 92
+        },
+        {
+          "stage": "product_activated",
+          "unique_users": 65
+        },
+        {
+          "stage": "first_purchase",
+          "unique_users": 50
+        }
+      ],
+      "overall_conversion": 4.166666666666666
+    },
+    "segments": {
+      "segments": [
+        {
+          "segment": "direct",
+          "total_users": 47,
+          "converted_users": 5,
+          "conversion_rate": 10.6
+        },
+        {
+          "segment": "referral",
+          "total_users": 177,
+          "converted_users": 16,
+          "conversion_rate": 9.0
+        },
+        {
+          "segment": "paid_search",
+          "total_users": 295,
+          "converted_users": 15,
+          "conversion_rate": 5.1
+        },
+        {
+          "segment": "content_marketing",
+          "total_users": 235,
+          "converted_users": 5,
+          "conversion_rate": 2.1
+        },
+        {
+          "segment": "social_media",
+          "total_users": 446,
+          "converted_users": 9,
+          "conversion_rate": 2.0
+        }
+      ],
+      "final_stage": "first_purchase"
+    },
+    "temporal": {
+      "violations": 0,
+      "status": "PASS"
+    }
+  }
+}
