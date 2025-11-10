@@ -23,11 +23,56 @@ def cli(verbose):
 @cli.command()
 @click.option('--description', '-d', required=True, help='Natural language description')
 @click.option('--output', '-o', type=click.Path(), help='Output file path (default: stdout)')
-def create(description, output):
-    """Create a schema from natural language description (requires LLM)."""
-    click.echo("❌ LLM integration not yet implemented (Phase 5)", err=True)
-    click.echo(f"Description: {description}", err=True)
-    raise SystemExit(1)
+@click.option('--model', default='claude-sonnet-4-20250514', help='Claude model to use')
+@click.option('--max-retries', default=3, type=int, help='Max auto-repair attempts')
+def create(description, output, model, max_retries):
+    """Create a schema from natural language description using Claude."""
+    from rich.console import Console
+    import os
+
+    console = Console()
+
+    # Check for API key
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        console.print("[bold red]❌ Error:[/bold red] ANTHROPIC_API_KEY environment variable not set")
+        console.print("[yellow]Set it with:[/yellow] export ANTHROPIC_API_KEY=your-key-here")
+        raise SystemExit(1)
+
+    console.print(f"\n[bold blue]🤖 Generating schema with {model}...[/bold blue]")
+    console.print(f"[dim]Description:[/dim] {description}")
+
+    try:
+        from datagen.llm import generate_schema_from_description
+
+        # Generate schema
+        schema_dict, dataset = generate_schema_from_description(
+            description=description,
+            model=model,
+            max_retries=max_retries,
+        )
+
+        console.print(f"[bold green]✓[/bold green] Schema generated: {dataset.metadata.name}")
+        console.print(f"[dim]Tables:[/dim] {len(dataset.nodes)}")
+
+        # Format JSON nicely
+        schema_json = json.dumps(schema_dict, indent=2)
+
+        # Output to file or stdout
+        if output:
+            with open(output, 'w') as f:
+                f.write(schema_json)
+            console.print(f"[bold green]✓[/bold green] Written to: {output}")
+        else:
+            click.echo(schema_json)
+
+    except ValueError as e:
+        console.print(f"[bold red]❌ Schema generation failed:[/bold red]")
+        console.print(f"[red]{e}[/red]")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[bold red]❌ Unexpected error:[/bold red]")
+        console.print(f"[red]{e}[/red]")
+        raise SystemExit(1)
 
 
 @cli.command()
