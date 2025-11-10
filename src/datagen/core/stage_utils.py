@@ -141,23 +141,27 @@ def generate_stage_events(
         parent_idx = row["parent_index"]
         final_stage_index = row["stage_index"]
 
+        # Track cumulative timestamp for this parent entity
+        current_timestamp = None
+        if timestamp_col and timestamp_col in parent_df.columns:
+            parent_timestamp = parent_df.iloc[parent_idx][timestamp_col]
+            current_timestamp = parent_timestamp
+
         # Generate events for all stages reached (including final one)
         for stage_idx in range(final_stage_index + 1):
             stage_name = stages[stage_idx]["stage_name"]
 
             # Calculate timestamp if parent has timestamp column
             timestamp = None
-            if timestamp_col and timestamp_col in parent_df.columns:
-                parent_timestamp = parent_df.iloc[parent_idx][timestamp_col]
-
-                # Add time offset for each stage
-                # First stage happens at parent timestamp, subsequent stages later
-                if stage_idx > 0:
-                    # Add random jitter around average time between stages
-                    hours_offset = rng.exponential(time_between_stages_hours * stage_idx)
-                    timestamp = parent_timestamp + pd.Timedelta(hours=hours_offset)
+            if current_timestamp is not None:
+                if stage_idx == 0:
+                    # First stage happens at parent timestamp
+                    timestamp = current_timestamp
                 else:
-                    timestamp = parent_timestamp
+                    # Add random time since previous stage (ensures monotonic increase)
+                    hours_since_prev = rng.exponential(time_between_stages_hours)
+                    timestamp = current_timestamp + pd.Timedelta(hours=hours_since_prev)
+                    current_timestamp = timestamp  # Update for next stage
 
             record = {
                 "event_id": event_id,

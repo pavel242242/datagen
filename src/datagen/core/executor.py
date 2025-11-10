@@ -569,8 +569,8 @@ class DatasetExecutor:
                 data[col.name] = stage_events["stage_index"].values
                 continue
 
-            # Check if this is a timestamp column from stage_events
-            if col.name == "timestamp" and "timestamp" in stage_events.columns:
+            # Check if this is a datetime column and we have timestamps from stage_events
+            if col.type == "datetime" and "timestamp" in stage_events.columns:
                 data[col.name] = stage_events["timestamp"].values
                 continue
 

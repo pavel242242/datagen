@@ -1,0 +1,236 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Healthcare Patient Journey - Features #1-3 Integration",
+    "description": "Patient care journey from initial contact through treatment stages. Demonstrates vintage effects (aging patient cohorts), segmentation (risk levels), and multi-stage care progression."
+  },
+  "timeframe": {
+    "start": "2023-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "h"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "care_event.patient_id", "to": "patient.patient_id"},
+      {"from": "appointment.patient_id", "to": "patient.patient_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "patient",
+      "kind": "entity",
+      "pk": "patient_id",
+      "rows": 800,
+      "segment_behavior": {
+        "segment_column": "risk_level",
+        "segments": {
+          "high_risk": {"base_probability": 0.15},
+          "medium_risk": {"base_probability": 0.45},
+          "low_risk": {"base_probability": 0.40}
+        }
+      },
+      "vintage_behavior": {
+        "created_at_column": "first_visit_date",
+        "age_based_multipliers": {
+          "engagement_decay": {
+            "curve": [1.0, 0.95, 0.88, 0.85, 0.82, 0.80, 0.78, 0.77, 0.76, 0.75, 0.74, 0.73],
+            "time_unit": "month",
+            "applies_to": "fanout"
+          },
+          "care_complexity": {
+            "curve": {"curve_type": "logarithmic", "params": {"a": 0.15, "b": 1.0}},
+            "time_unit": "month",
+            "applies_to": ["treatment_cost"]
+          }
+        }
+      },
+      "columns": [
+        {
+          "name": "patient_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 2000, "step": 1}}
+        },
+        {
+          "name": "patient_name",
+          "type": "string",
+          "generator": {"faker": {"method": "name"}}
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {"mean": 52, "sigma": 18},
+              "clamp": [18, 95]
+            }
+          }
+        },
+        {
+          "name": "risk_level",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["high_risk", "medium_risk", "low_risk"],
+              "weights": [0.15, 0.45, 0.40]
+            }
+          }
+        },
+        {
+          "name": "first_visit_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2023-01-01T00:00:00Z",
+                "end": "2024-06-30T23:59:59Z"
+              },
+              "freq": "h",
+              "pattern": {
+                "dimension": "dow",
+                "weights": [1.3, 1.3, 1.3, 1.3, 1.3, 0.4, 0.2]
+              }
+            }
+          }
+        },
+        {
+          "name": "insurance_type",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["private", "medicare", "medicaid", "self_pay"],
+              "weights": [0.50, 0.25, 0.15, 0.10]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "care_event",
+      "kind": "fact",
+      "pk": "care_event_id",
+      "parents": ["patient"],
+      "stage_config": {
+        "stages": [
+          {"stage_name": "initial_contact", "transition_rate": 1.0},
+          {"stage_name": "screening", "transition_rate": 0.88},
+          {"stage_name": "diagnosis", "transition_rate": 0.92},
+          {"stage_name": "treatment_plan", "transition_rate": 0.85},
+          {"stage_name": "treatment_started", "transition_rate": 0.90},
+          {"stage_name": "follow_up", "transition_rate": 0.75}
+        ],
+        "segment_variation": {
+          "high_risk": {"transition_multiplier": 1.15},
+          "medium_risk": {"transition_multiplier": 1.0},
+          "low_risk": {"transition_multiplier": 0.88}
+        }
+      },
+      "columns": [
+        {
+          "name": "care_event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 5000, "step": 1}}
+        },
+        {
+          "name": "patient_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "patient.patient_id"}}
+        },
+        {
+          "name": "stage_name",
+          "type": "string",
+          "generator": {"choice": {"choices": ["initial_contact"]}}
+        },
+        {
+          "name": "stage_index",
+          "type": "int",
+          "generator": {"sequence": {"start": 0, "step": 1}}
+        },
+        {
+          "name": "event_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2023-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "provider_id",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "uniform",
+              "params": {"low": 100, "high": 150},
+              "clamp": [100, 150]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "appointment",
+      "kind": "fact",
+      "pk": "appointment_id",
+      "parents": ["patient"],
+      "fanout": {
+        "distribution": "poisson",
+        "lambda": 4
+      },
+      "columns": [
+        {
+          "name": "appointment_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 20000, "step": 1}}
+        },
+        {
+          "name": "patient_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "patient.patient_id"}}
+        },
+        {
+          "name": "appointment_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2023-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D",
+              "pattern": {
+                "dimension": "dow",
+                "weights": [1.3, 1.3, 1.3, 1.3, 1.3, 0.3, 0.1]
+              }
+            }
+          }
+        },
+        {
+          "name": "appointment_type",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["consultation", "procedure", "follow_up", "lab_work"],
+              "weights": [0.35, 0.20, 0.30, 0.15]
+            }
+          }
+        },
+        {
+          "name": "duration_minutes",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {"mean": 30, "sigma": 15},
+              "clamp": [15, 120]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
