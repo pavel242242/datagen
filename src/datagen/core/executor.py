@@ -12,6 +12,15 @@ from datagen.core.seed import SeedManager
 from datagen.core.generators.registry import GeneratorRegistry
 from datagen.core.generators.primitives import sample_fanout
 from datagen.core.modifiers import apply_modifiers
+from datagen.core.vintage_utils import (
+    calculate_entity_ages,
+    apply_vintage_multipliers_to_fanout,
+    apply_vintage_multipliers_to_values,
+)
+from datagen.core.stage_utils import (
+    calculate_stage_progression,
+    generate_stage_events,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -204,9 +213,7 @@ class DatasetExecutor:
         primary_parent_id = node.parents[0]
 
         if primary_parent_id not in self.generated_data:
-            raise ValueError(
-                f"Parent '{primary_parent_id}' not generated yet for fact '{node.id}'"
-            )
+            raise ValueError(f"Parent '{primary_parent_id}' not generated yet for fact '{node.id}'")
 
         parent_df = self.generated_data[primary_parent_id]
         parent_node = self.nodes_by_id[primary_parent_id]
@@ -215,6 +222,10 @@ class DatasetExecutor:
             f"Generating fact '{node.id}' from parent '{primary_parent_id}' "
             f"({len(parent_df)} parent rows)"
         )
+
+        # Check if this is a multi-stage process (Feature #3)
+        if node.stage_config:
+            return self._generate_fact_with_stages(node, parent_df, parent_node)
 
         # Sample fanout for each parent row
         if node.fanout:
@@ -238,9 +249,7 @@ class DatasetExecutor:
                                 # Assume first row for now (simplified)
                                 all_parents_df[col] = other_parent[col].iloc[0]
 
-            fanout_counts = self._apply_table_effects_to_fanout(
-                node, fanout_counts, all_parents_df
-            )
+            fanout_counts = self._apply_table_effects_to_fanout(node, fanout_counts, all_parents_df)
 
         # Apply segment-based fanout multipliers from ANY parent with segment_behavior
         for parent_id in node.parents:
@@ -251,6 +260,21 @@ class DatasetExecutor:
                     fanout_counts = self._apply_segment_multipliers_to_fanout(
                         p_node, fanout_counts, p_df
                     )
+
+        # Apply vintage-based fanout multipliers from ANY parent with vintage_behavior
+        parent_vintage_node = None
+        parent_entity_ages = None
+        for parent_id in node.parents:
+            if parent_id in self.generated_data:
+                p_node = self.nodes_by_id[parent_id]
+                p_df = self.generated_data[parent_id]
+                if p_node.vintage_behavior:
+                    fanout_counts, entity_ages = self._apply_vintage_multipliers_to_fanout(
+                        p_node, fanout_counts, p_df
+                    )
+                    parent_vintage_node = p_node
+                    parent_entity_ages = entity_ages  # Store for column value multipliers
+                    break  # Use first parent with vintage_behavior
 
         total_rows = fanout_counts.sum()
         logger.debug(f"  Total fanout: {total_rows} child rows (mean={fanout_counts.mean():.2f})")
@@ -268,7 +292,7 @@ class DatasetExecutor:
                 p_df = self.generated_data[parent_id]
                 if p_node.segment_behavior:
                     segment_config = p_node.segment_behavior
-                    segment_col_name = segment_config.get('segment_column')
+                    segment_col_name = segment_config.get("segment_column")
                     if segment_col_name and segment_col_name in p_df.columns:
                         parent_segment_column = segment_col_name
                         parent_segment_node = p_node
@@ -309,9 +333,15 @@ class DatasetExecutor:
                 if col.type in ["datetime", "date"]:
                     # Filter out seasonality and outliers - these should affect occurrence, not values
                     remaining_modifiers = [
-                        m for m in col.modifiers
-                        if not (hasattr(m, 'transform') and m.transform in ['seasonality', 'outliers'])
-                        and not (isinstance(m, dict) and m.get('transform') in ['seasonality', 'outliers'])
+                        m
+                        for m in col.modifiers
+                        if not (
+                            hasattr(m, "transform") and m.transform in ["seasonality", "outliers"]
+                        )
+                        and not (
+                            isinstance(m, dict)
+                            and m.get("transform") in ["seasonality", "outliers"]
+                        )
                     ]
                     if remaining_modifiers:
                         context_df = self._build_context_with_effects(data, col.modifiers)
@@ -323,21 +353,98 @@ class DatasetExecutor:
             # Cast
             values = self._cast_to_dtype(values, col.type, col.nullable)
 
+            # Apply temporal constraints: fact timestamps must be >= parent created_at
+            if (
+                col.type in ["datetime", "date"]
+                and parent_vintage_node
+                and parent_vintage_node.vintage_behavior
+            ):
+                vintage_config = parent_vintage_node.vintage_behavior
+                created_at_col = vintage_config.get("created_at_column")
+
+                if created_at_col and created_at_col in parent_df.columns:
+                    # Get parent created_at timestamps for each child row
+                    parent_created_at = parent_df[created_at_col].values[parent_indices]
+
+                    # Convert to pandas Series for easier datetime handling
+                    values_series = pd.Series(values)
+                    parent_created_series = pd.Series(parent_created_at)
+
+                    # Ensure both are datetime
+                    if not pd.api.types.is_datetime64_any_dtype(values_series):
+                        values_series = pd.to_datetime(values_series)
+                    if not pd.api.types.is_datetime64_any_dtype(parent_created_series):
+                        parent_created_series = pd.to_datetime(parent_created_series)
+
+                    # Find violations (fact timestamp < parent created_at)
+                    violations = values_series < parent_created_series
+
+                    if violations.any():
+                        # Resample violated timestamps from [parent_created_at, timeframe.end]
+                        n_violations = violations.sum()
+                        logger.debug(
+                            f"  Fixing {n_violations} temporal violations in {node.id}.{col.name}"
+                        )
+
+                        # Use timeframe end as upper bound
+                        if self.dataset.timeframe:
+                            end_time = pd.to_datetime(self.dataset.timeframe.end)
+                        else:
+                            # Fallback to max of current values
+                            end_time = values_series.max()
+
+                        # Normalize timezone of end_time to match parent_created
+                        if hasattr(end_time, "tz") and end_time.tz is not None:
+                            end_time = end_time.tz_localize(None)
+
+                        # For each violation, sample uniformly between parent_created_at and end_time
+                        for idx in violations[violations].index:
+                            parent_created = parent_created_series.iloc[idx]
+                            # Random timestamp between parent_created and end_time
+                            time_range = (end_time - parent_created).total_seconds()
+                            if time_range > 0:
+                                random_offset = pd.Timedelta(
+                                    seconds=col_rng.uniform(0, time_range)
+                                )
+                                values_series.iloc[idx] = parent_created + random_offset
+                            else:
+                                # If parent_created >= end_time, just use parent_created
+                                values_series.iloc[idx] = parent_created
+
+                        values = values_series.values
+
             # Apply segment-based value multipliers if applicable
-            if (parent_segment_column and
-                parent_segment_node and
-                parent_segment_node.segment_behavior and
-                col.type in ["int", "float"]):
+            if (
+                parent_segment_column
+                and parent_segment_node
+                and parent_segment_node.segment_behavior
+                and col.type in ["int", "float"]
+            ):
 
                 segment_config = parent_segment_node.segment_behavior
-                applies_to = segment_config.get('applies_to_columns', [])
+                applies_to = segment_config.get("applies_to_columns", [])
 
                 # Apply value multiplier if this column is in the applies_to list
                 if col.name in applies_to:
-                    behaviors = segment_config.get('behaviors', {})
+                    behaviors = segment_config.get("behaviors", {})
                     values = self._apply_segment_value_multipliers(
                         values, parent_segment_values, behaviors
                     )
+
+            # Apply vintage-based value multipliers if applicable
+            if (
+                parent_entity_ages is not None
+                and parent_vintage_node
+                and parent_vintage_node.vintage_behavior
+                and col.type in ["int", "float"]
+            ):
+
+                # Expand entity ages to child row level
+                child_entity_ages = parent_entity_ages[parent_indices]
+
+                values = apply_vintage_multipliers_to_values(
+                    values, child_entity_ages, col.name, parent_vintage_node.vintage_behavior
+                )
 
             data[col.name] = values
 
@@ -345,11 +452,7 @@ class DatasetExecutor:
         return df
 
     def _generate_column(
-        self,
-        col,
-        size: int,
-        rng: np.random.Generator,
-        context: Optional[pd.DataFrame]
+        self, col, size: int, rng: np.random.Generator, context: Optional[pd.DataFrame]
     ) -> np.ndarray:
         """Generate values for a column."""
         timeframe = {
@@ -362,18 +465,15 @@ class DatasetExecutor:
         if col.type in ["datetime", "date"] and col.modifiers:
             patterns = []
             for modifier in col.modifiers:
-                if hasattr(modifier, 'transform'):
+                if hasattr(modifier, "transform"):
                     transform = modifier.transform
                     args = modifier.args
                 else:
-                    transform = modifier.get('transform')
-                    args = modifier.get('args', {})
+                    transform = modifier.get("transform")
+                    args = modifier.get("args", {})
 
-                if transform == 'seasonality':
-                    patterns.append({
-                        "dimension": args["dimension"],
-                        "weights": args["weights"]
-                    })
+                if transform == "seasonality":
+                    patterns.append({"dimension": args["dimension"], "weights": args["weights"]})
 
             if patterns:
                 extra_patterns = patterns
@@ -384,7 +484,7 @@ class DatasetExecutor:
             rng,
             context=context,
             timeframe=timeframe,
-            extra_patterns=extra_patterns
+            extra_patterns=extra_patterns,
         )
 
         # Convert pandas Series to numpy array if needed
@@ -392,6 +492,124 @@ class DatasetExecutor:
             return result.values
 
         return result
+
+    def _generate_fact_with_stages(
+        self,
+        node: Node,
+        parent_df: pd.DataFrame,
+        parent_node: Node
+    ) -> pd.DataFrame:
+        """
+        Generate fact table using multi-stage process logic (Feature #3).
+
+        Instead of using fanout, generates events for each stage a parent entity reaches.
+        """
+        logger.debug(f"  Using multi-stage process for '{node.id}'")
+
+        # Get segment column from parent if available
+        parent_segment_col = None
+        if parent_node.segment_behavior:
+            segment_config = parent_node.segment_behavior
+            segment_col_name = segment_config.get("segment_column")
+            if segment_col_name and segment_col_name in parent_df.columns:
+                parent_segment_col = segment_col_name
+
+        # Calculate stage progression for each parent
+        rng = self.seed_manager.node_rng(node.id)
+        stage_progression = calculate_stage_progression(
+            parent_df,
+            node.stage_config,
+            parent_segment_col=parent_segment_col,
+            rng=rng
+        )
+
+        # Find timestamp column in parent for temporal ordering
+        timestamp_col = None
+        for col in parent_df.columns:
+            if pd.api.types.is_datetime64_any_dtype(parent_df[col]):
+                timestamp_col = col
+                break
+
+        # Generate stage events
+        stage_events = generate_stage_events(
+            parent_df,
+            stage_progression,
+            node.stage_config,
+            pk_start=1,
+            timestamp_col=timestamp_col,
+            time_between_stages_hours=24.0,  # TODO: Make configurable
+            rng=rng
+        )
+
+        logger.debug(f"  Generated {len(stage_events)} stage events")
+
+        # Now generate the actual fact table columns
+        # Build mapping from event to parent
+        parent_indices = stage_events["parent_index"].values
+        n_rows = len(stage_events)
+
+        data = {}
+
+        # Generate columns
+        for col in node.columns:
+            col_rng = self.seed_manager.column_rng(node.id, col.name)
+
+            # Check if this is the PK column (use event_id from stage_events)
+            if col.name == node.pk:
+                data[col.name] = stage_events["event_id"].values
+                continue
+
+            # Check if this is a stage_name column
+            if col.name == "stage_name" and "stage_name" in stage_events.columns:
+                data[col.name] = stage_events["stage_name"].values
+                continue
+
+            # Check if this is a stage_index column
+            if col.name == "stage_index" and "stage_index" in stage_events.columns:
+                data[col.name] = stage_events["stage_index"].values
+                continue
+
+            # Check if this is a datetime column and we have timestamps from stage_events
+            if col.type == "datetime" and "timestamp" in stage_events.columns:
+                data[col.name] = stage_events["timestamp"].values
+                continue
+
+            # Check if this is a parent FK (lookup generator)
+            if isinstance(col.generator, dict) and "lookup" in col.generator:
+                # Generate FK values
+                lookup_spec = col.generator["lookup"]
+                from_ref = lookup_spec.get("from", "")
+
+                # Check if it's the primary parent
+                if from_ref.startswith(f"{parent_node.id}."):
+                    # Use parent indices to map to parent PK
+                    parent_pk_col = from_ref.split(".")[1]
+                    if parent_pk_col in parent_df.columns:
+                        data[col.name] = parent_df[parent_pk_col].values[parent_indices]
+                        continue
+
+            # Generate values using regular generators
+            values = self.registry.generate(
+                col.generator,
+                n_rows,
+                col_rng,
+                timeframe=self.dataset.timeframe
+            )
+
+            # Apply modifiers if present
+            if col.modifiers:
+                # Create context DataFrame for modifiers
+                context = pd.DataFrame(data) if data else pd.DataFrame()
+                if "timestamp" in stage_events.columns:
+                    context["_timestamp"] = stage_events["timestamp"].values
+
+                values = apply_modifiers(values, col.modifiers, col_rng, context)
+
+            # Store column
+            data[col.name] = values
+
+        df = pd.DataFrame(data)
+        return df
 
     def _sample_fanout(self, node: Node, n_parents: int) -> np.ndarray:
         """Sample fanout counts for parents."""
@@ -404,14 +622,11 @@ class DatasetExecutor:
             rng,
             lambda_=fanout_spec.lambda_,
             min_val=fanout_spec.min,
-            max_val=fanout_spec.max
+            max_val=fanout_spec.max,
         )
 
     def _apply_table_effects_to_fanout(
-        self,
-        node: Node,
-        fanout_counts: np.ndarray,
-        parent_df: pd.DataFrame
+        self, node: Node, fanout_counts: np.ndarray, parent_df: pd.DataFrame
     ) -> np.ndarray:
         """
         Apply table-level effect modifiers to scale fanout counts.
@@ -421,31 +636,33 @@ class DatasetExecutor:
         result_counts = fanout_counts.copy().astype(float)
 
         for modifier in node.modifiers:
-            if hasattr(modifier, 'transform'):
+            if hasattr(modifier, "transform"):
                 transform = modifier.transform
                 args = modifier.args
             else:
-                transform = modifier.get('transform')
-                args = modifier.get('args', {})
+                transform = modifier.get("transform")
+                args = modifier.get("args", {})
 
-            if transform != 'effect':
+            if transform != "effect":
                 continue
 
-            effect_table_name = args.get('effect_table')
+            effect_table_name = args.get("effect_table")
             if not effect_table_name or effect_table_name not in self.generated_data:
-                logger.warning(f"Effect table {effect_table_name} not found, skipping table-level effect")
+                logger.warning(
+                    f"Effect table {effect_table_name} not found, skipping table-level effect"
+                )
                 continue
 
             effect_df = self.generated_data[effect_table_name]
-            on = args.get('on', {})
-            window = args.get('window', {})
-            map_spec = args.get('map', {})
+            on = args.get("on", {})
+            window = args.get("window", {})
+            map_spec = args.get("map", {})
 
-            start_col = window.get('start_col')
-            end_col = window.get('end_col')
-            field = map_spec.get('field')
-            op = map_spec.get('op', 'mul')
-            default = map_spec.get('default', 1.0)
+            start_col = window.get("start_col")
+            end_col = window.get("end_col")
+            field = map_spec.get("field")
+            op = map_spec.get("op", "mul")
+            default = map_spec.get("default", 1.0)
 
             # Find timestamp column in parent for window matching
             timestamp_col = None
@@ -475,17 +692,28 @@ class DatasetExecutor:
                         if local_key not in parent_df.columns:
                             continue
                         local_value = parent_df[local_key].iloc[idx]
-                        matching_effects = matching_effects[matching_effects[effect_key] == local_value]
+                        matching_effects = matching_effects[
+                            matching_effects[effect_key] == local_value
+                        ]
 
                 # Filter by time window
-                if start_col and end_col and start_col in effect_df.columns and end_col in effect_df.columns:
+                if (
+                    start_col
+                    and end_col
+                    and start_col in effect_df.columns
+                    and end_col in effect_df.columns
+                ):
                     effect_start = pd.to_datetime(matching_effects[start_col]).dt.tz_localize(None)
                     effect_end = pd.to_datetime(matching_effects[end_col]).dt.tz_localize(None)
-                    parent_ts_normalized = pd.to_datetime(parent_timestamp).tz_localize(None) if hasattr(parent_timestamp, 'tz_localize') else parent_timestamp
+                    parent_ts_normalized = (
+                        pd.to_datetime(parent_timestamp).tz_localize(None)
+                        if hasattr(parent_timestamp, "tz_localize")
+                        else parent_timestamp
+                    )
 
                     matching_effects = matching_effects[
-                        (effect_start <= parent_ts_normalized) &
-                        (effect_end >= parent_ts_normalized)
+                        (effect_start <= parent_ts_normalized)
+                        & (effect_end >= parent_ts_normalized)
                     ]
 
                 # Apply effect multiplier to fanout
@@ -498,19 +726,16 @@ class DatasetExecutor:
                 else:
                     effect_value = default
 
-                if op == 'mul':
+                if op == "mul":
                     result_counts[idx] *= effect_value
-                elif op == 'add':
+                elif op == "add":
                     result_counts[idx] += effect_value
 
         # Round and convert back to int, ensuring non-negative
         return np.maximum(0, np.round(result_counts)).astype(int)
 
     def _apply_segment_multipliers_to_fanout(
-        self,
-        parent_node: Node,
-        fanout_counts: np.ndarray,
-        parent_df: pd.DataFrame
+        self, parent_node: Node, fanout_counts: np.ndarray, parent_df: pd.DataFrame
     ) -> np.ndarray:
         """
         Apply segment-based multipliers to fanout counts.
@@ -531,7 +756,7 @@ class DatasetExecutor:
             return fanout_counts
 
         # Get segment column name
-        segment_column = segment_config.get('segment_column')
+        segment_column = segment_config.get("segment_column")
         if not segment_column or segment_column not in parent_df.columns:
             logger.warning(
                 f"Segment column '{segment_column}' not found in parent '{parent_node.id}', "
@@ -540,7 +765,7 @@ class DatasetExecutor:
             return fanout_counts
 
         # Get behavior definitions
-        behaviors = segment_config.get('behaviors', {})
+        behaviors = segment_config.get("behaviors", {})
         if not behaviors:
             logger.warning(
                 f"No behaviors defined in segment_behavior for '{parent_node.id}', "
@@ -553,7 +778,7 @@ class DatasetExecutor:
         # Apply multiplier for each parent based on its segment
         for idx, segment_value in enumerate(parent_df[segment_column]):
             segment_behavior = behaviors.get(segment_value, {})
-            fanout_multiplier = segment_behavior.get('fanout_multiplier', 1.0)
+            fanout_multiplier = segment_behavior.get("fanout_multiplier", 1.0)
             result_counts[idx] *= fanout_multiplier
 
         logger.debug(
@@ -565,10 +790,7 @@ class DatasetExecutor:
         return np.maximum(0, np.round(result_counts)).astype(int)
 
     def _apply_segment_value_multipliers(
-        self,
-        values: np.ndarray,
-        parent_segments: np.ndarray,
-        behaviors: dict
+        self, values: np.ndarray, parent_segments: np.ndarray, behaviors: dict
     ) -> np.ndarray:
         """
         Apply segment-based value multipliers to column values.
@@ -588,10 +810,75 @@ class DatasetExecutor:
 
         for idx, segment_value in enumerate(parent_segments):
             segment_behavior = behaviors.get(segment_value, {})
-            value_multiplier = segment_behavior.get('value_multiplier', 1.0)
+            value_multiplier = segment_behavior.get("value_multiplier", 1.0)
             result[idx] *= value_multiplier
 
         return result
+
+    def _apply_vintage_multipliers_to_fanout(
+        self, parent_node: Node, fanout_counts: np.ndarray, parent_df: pd.DataFrame
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Apply vintage-based multipliers to fanout counts.
+
+        Calculates entity age from created_at timestamp and applies
+        age-based decay curves to fanout.
+
+        Args:
+            parent_node: Parent node with vintage_behavior config
+            fanout_counts: Array of fanout counts for each parent
+            parent_df: DataFrame of parent records
+
+        Returns:
+            Tuple of (modified fanout counts, entity ages array)
+        """
+        vintage_config = parent_node.vintage_behavior
+        if not vintage_config:
+            return fanout_counts, np.zeros(len(parent_df))
+
+        # Get created_at column name
+        created_at_col = vintage_config.get("created_at_column", "created_at")
+        if created_at_col not in parent_df.columns:
+            logger.warning(
+                f"Vintage created_at column '{created_at_col}' not found in parent '{parent_node.id}', "
+                f"skipping vintage multipliers"
+            )
+            return fanout_counts, np.zeros(len(parent_df))
+
+        # Get time unit for age calculation
+        age_based_multipliers = vintage_config.get("age_based_multipliers", {})
+        if not age_based_multipliers:
+            logger.warning(
+                f"No age_based_multipliers defined in vintage_behavior for '{parent_node.id}', "
+                f"skipping vintage multipliers"
+            )
+            return fanout_counts, np.zeros(len(parent_df))
+
+        # Get time unit from first multiplier (assume all use same unit)
+        first_multiplier = list(age_based_multipliers.values())[0]
+        time_unit = first_multiplier.get("time_unit", "month")
+
+        # Calculate entity ages
+        # For now, use dataset end time as reference
+        # (In a real scenario with timestamps, we'd use fact timestamp)
+        reference_time = pd.to_datetime(self.dataset.timeframe.end)
+        entity_created_at = pd.to_datetime(parent_df[created_at_col])
+
+        entity_ages = calculate_entity_ages(
+            entity_created_at, pd.Series([reference_time] * len(parent_df)), time_unit=time_unit
+        )
+
+        # Apply vintage multipliers to fanout
+        modified_fanout = apply_vintage_multipliers_to_fanout(
+            fanout_counts, entity_ages, vintage_config
+        )
+
+        logger.debug(
+            f"  Applied vintage multipliers to fanout: mean changed from "
+            f"{fanout_counts.mean():.2f} to {modified_fanout.mean():.2f}"
+        )
+
+        return modified_fanout, entity_ages
 
     def _build_context_with_effects(self, data: dict, modifiers: list) -> pd.DataFrame:
         """
@@ -604,19 +891,21 @@ class DatasetExecutor:
 
         # Find effect tables referenced in modifiers
         for modifier in modifiers:
-            if hasattr(modifier, 'transform'):
+            if hasattr(modifier, "transform"):
                 transform = modifier.transform
                 args = modifier.args
             else:
-                transform = modifier.get('transform')
-                args = modifier.get('args', {})
+                transform = modifier.get("transform")
+                args = modifier.get("args", {})
 
-            if transform == 'effect':
-                effect_table_name = args.get('effect_table')
+            if transform == "effect":
+                effect_table_name = args.get("effect_table")
                 if effect_table_name and effect_table_name in self.generated_data:
                     # Add effect table as a column (each row gets the full table)
                     effect_df = self.generated_data[effect_table_name]
-                    context_df[f"_effect_{effect_table_name}"] = [effect_df] * len(context_df) if len(context_df) > 0 else []
+                    context_df[f"_effect_{effect_table_name}"] = (
+                        [effect_df] * len(context_df) if len(context_df) > 0 else []
+                    )
 
         return context_df
 
@@ -658,7 +947,7 @@ class DatasetExecutor:
             "tables": {
                 table_id: {"rows": len(df), "columns": len(df.columns)}
                 for table_id, df in self.generated_data.items()
-            }
+            },
         }
 
         write_metadata(metadata, output_dir / ".metadata.json")
@@ -666,9 +955,7 @@ class DatasetExecutor:
 
 
 def generate_dataset(
-    dataset: Dataset,
-    master_seed: int = 42,
-    output_dir: Optional[Path] = None
+    dataset: Dataset, master_seed: int = 42, output_dir: Optional[Path] = None
 ) -> dict[str, pd.DataFrame]:
     """
     Main entry point for dataset generation.

@@ -1,0 +1,147 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Manufacturing IoT Sensors - Vintage Effects Demo",
+    "description": "Demonstrates vintage effects in manufacturing: sensor reporting decay and error rate growth over device lifetime",
+    "domain": "Manufacturing / IoT / Industrial",
+    "use_case": "Device degradation analysis, predictive maintenance, sensor reliability tracking"
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "measurement.device_id", "to": "device.device_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "device",
+      "kind": "entity",
+      "pk": "device_id",
+      "rows": 300,
+      "columns": [
+        {
+          "name": "device_id",
+          "type": "string",
+          "generator": {
+            "faker": {"method": "bothify", "text": "DEV-####-????"}
+          }
+        },
+        {
+          "name": "installation_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "factory_location",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["Factory-A", "Factory-B", "Factory-C", "Factory-D"],
+              "weights": [0.4, 0.3, 0.2, 0.1]
+            }
+          }
+        }
+      ],
+      "vintage_behavior": {
+        "created_at_column": "installation_date",
+        "age_based_multipliers": {
+          "reporting_decay": {
+            "curve": {
+              "curve_type": "exponential",
+              "params": {"a": 1.0, "b": -0.03}
+            },
+            "time_unit": "month",
+            "applies_to": "fanout"
+          },
+          "error_rate_growth": {
+            "curve": {
+              "curve_type": "exponential",
+              "params": {"a": 1.0, "b": 0.08}
+            },
+            "time_unit": "month",
+            "applies_to": ["error_code"]
+          },
+          "degradation_multiplier": {
+            "curve": [1.0, 1.0, 0.98, 0.95, 0.92, 0.88, 0.85, 0.82, 0.78, 0.75, 0.72, 0.70],
+            "time_unit": "month",
+            "applies_to": ["sensor_value"]
+          }
+        }
+      }
+    },
+    {
+      "id": "measurement",
+      "kind": "fact",
+      "pk": "measurement_id",
+      "parents": ["device"],
+      "fanout": {
+        "distribution": "poisson",
+        "lambda": 100
+      },
+      "columns": [
+        {
+          "name": "measurement_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "device_id",
+          "type": "string",
+          "generator": {"lookup": {"from": "device.device_id"}}
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "sensor_value",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {
+                "mean": 100.0,
+                "sigma": 5.0
+              },
+              "clamp": [80, 120]
+            }
+          }
+        },
+        {
+          "name": "error_code",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "poisson",
+              "params": {
+                "lambda": 0.5
+              },
+              "clamp": [0, 10]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

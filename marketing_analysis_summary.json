@@ -1,0 +1,150 @@
+{
+  "report_title": "Growth Marketing Attribution Analysis",
+  "period": "January - December 2024",
+  "executive_summary": {
+    "total_users": 1200,
+    "total_purchasers": 50,
+    "end_to_end_conversion_pct": 4.17,
+    "total_revenue_usd": 537171.03,
+    "total_ad_spend_usd": 11843.65,
+    "roi_pct": 4435.5,
+    "cac_usd": 236.87,
+    "ltv_usd": 10743.42,
+    "ltv_cac_ratio": 45.36
+  },
+  "funnel_stages": [
+    {
+      "stage": "ad_impression",
+      "users": 1200,
+      "pct_of_previous": 100
+    },
+    {
+      "stage": "ad_click",
+      "users": 179,
+      "pct_of_previous": 14.92
+    },
+    {
+      "stage": "landing_page_view",
+      "users": 175,
+      "pct_of_previous": 97.77
+    },
+    {
+      "stage": "signup_started",
+      "users": 94,
+      "pct_of_previous": 53.71
+    },
+    {
+      "stage": "signup_completed",
+      "users": 92,
+      "pct_of_previous": 97.87
+    },
+    {
+      "stage": "product_activated",
+      "users": 65,
+      "pct_of_previous": 70.65
+    },
+    {
+      "stage": "first_purchase",
+      "users": 50,
+      "pct_of_previous": 76.92
+    }
+  ],
+  "channel_performance": [
+    {
+      "channel": "direct",
+      "users": 47,
+      "purchasers": 5,
+      "conv_pct": 10.64,
+      "revenue": 19696.62
+    },
+    {
+      "channel": "referral",
+      "users": 177,
+      "purchasers": 16,
+      "conv_pct": 9.04,
+      "revenue": 79545.93
+    },
+    {
+      "channel": "paid_search",
+      "users": 295,
+      "purchasers": 15,
+      "conv_pct": 5.08,
+      "revenue": 132084.5
+    },
+    {
+      "channel": "content_marketing",
+      "users": 235,
+      "purchasers": 5,
+      "conv_pct": 2.13,
+      "revenue": 103364.3
+    },
+    {
+      "channel": "social_media",
+      "users": 446,
+      "purchasers": 9,
+      "conv_pct": 2.02,
+      "revenue": 202479.67
+    }
+  ],
+  "device_performance": [
+    {
+      "device": "tablet",
+      "users": 187,
+      "purchasers": 26,
+      "conv_pct": 13.9,
+      "ad_spend": 1315.74
+    },
+    {
+      "device": "desktop",
+      "users": 563,
+      "purchasers": 49,
+      "conv_pct": 8.7,
+      "ad_spend": 4788.03
+    },
+    {
+      "device": "mobile",
+      "users": 659,
+      "purchasers": 49,
+      "conv_pct": 7.44,
+      "ad_spend": 5739.88
+    }
+  ],
+  "critical_insights": [
+    {
+      "finding": "Ad Click-Through Rate Crisis",
+      "impact": "85% of users never click ads",
+      "current_rate": "14.92%",
+      "priority": "CRITICAL",
+      "revenue_opportunity_usd": 53000
+    },
+    {
+      "finding": "Landing Page Dropout",
+      "impact": "46% abandon between landing page and signup",
+      "current_rate": "53.71%",
+      "priority": "HIGH",
+      "revenue_opportunity_usd": 21000
+    },
+    {
+      "finding": "Product Activation Friction",
+      "impact": "29% don't activate after signup completion",
+      "current_rate": "70.65%",
+      "priority": "HIGH",
+      "revenue_opportunity_usd": 21000
+    },
+    {
+      "finding": "Tablet Device Premium",
+      "impact": "Tablet users convert at 1.87x mobile rate",
+      "current_rate": "13.90%",
+      "priority": "MEDIUM",
+      "revenue_opportunity_usd": 15000
+    }
+  ],
+  "data_quality": {
+    "overall_rating": "EXCELLENT",
+    "user_coverage_pct": 99.9,
+    "timestamp_ordering_pct": 100,
+    "funnel_sequencing_pct": 100,
+    "revenue_validation": "CLEAN",
+    "null_values": 0
+  }
+}
