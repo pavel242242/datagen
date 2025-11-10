@@ -156,14 +156,20 @@ def get_seasonality_multiplier(
     """
     ts = pd.to_datetime(timestamps)
 
+    # Handle both Series (needs .dt accessor) and DatetimeIndex (direct access)
+    if isinstance(ts, pd.Series):
+        dt_accessor = ts.dt
+    else:
+        dt_accessor = ts
+
     if dimension == "hour":
-        components = ts.hour
+        components = dt_accessor.hour
         expected_len = 24
     elif dimension == "dow":
-        components = ts.dayofweek
+        components = dt_accessor.dayofweek
         expected_len = 7
     elif dimension == "month":
-        components = ts.month - 1
+        components = dt_accessor.month - 1
         expected_len = 12
     else:
         raise ValueError(f"Unknown seasonality dimension: {dimension}")
