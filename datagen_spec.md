@@ -117,6 +117,10 @@ Node:
 - `parents?: string[]`  // MVP: at most one primary parent for facts
 - `fanout?: Fanout`     // facts only
 - `columns: Column[]`
+- `vintage_behavior?: VintageBehavior`  // age-based multipliers (entities)
+- `segment_behavior?: SegmentBehavior`  // segment-specific multipliers (entities)
+- `stage_config?: StageConfig`          // multi-stage processes (facts)
+- `state_transition_model?: StateModel` // Markov chains (facts)
 
 Column:
 - `name: string`
@@ -145,8 +149,20 @@ GeneratorSpec (allowed primitives):
 - `enum_list: { values: any[] }` // for vocab nodes
 
 ModifierSpec (generic effects):
-- `{ transform: "multiply"|"add"|"clamp"|"jitter"|"map_values"|"seasonality"|"time_jitter"|"effect"|"outliers",
+- `{ transform: "multiply"|"add"|"clamp"|"jitter"|"map_values"|"seasonality"|"time_jitter"|"effect"|"outliers"|"trend",
      args: object }`
+
+VintageBehavior (age-based multipliers):
+- `{ age_based_multipliers: { [key: string]: { curve: number[] | { type: "linear"|"exponential"|"logarithmic", params: object }, time_unit: "day"|"month"|"year", applies_to: "fanout" | string[] } } }`
+
+SegmentBehavior (segment multipliers):
+- `{ [segment_name: string]: { fanout_multiplier?: number, value_multiplier?: number } }`
+
+StageConfig (conversion funnels):
+- `{ stages: { stage_name: string, transition_rate: number }[], time_between_stages_hours?: number, segment_variation?: { [segment: string]: { transition_multiplier: number } } }`
+
+StateModel (Markov chains):
+- `{ initial_state: string, states: { [state: string]: { transition_prob_per_period?: number, next_states?: { [state: string]: number }, terminal?: boolean } }, period_unit: "day"|"week"|"month", max_transitions?: number, segment_variation?: { [segment: string]: { churn_multiplier: number } }, vintage_variation?: { churn_multiplier_curve: number[] } }`
 
 Constraints (MVP):
 - `unique: string[]`            // ["table.pk", ...]

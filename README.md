@@ -180,6 +180,36 @@ Transform generated data for realism:
 - `seasonality` - Time-based patterns (hour/day/month)
 - `outliers` - Inject spikes or drops
 - `map_values` - Categorical remapping
+- `trend` - Growth/decay patterns (exponential, linear, logarithmic)
+
+### 📊 Advanced Analytics (Phase 4)
+
+**Cohort & Vintage Analysis:**
+- Age-based activity decay curves
+- Customer lifetime value (LTV) modeling
+- Retention analysis across cohorts
+
+**Behavioral Segmentation:**
+- Segment-specific fanout multipliers (VIP customers order 3x more)
+- Value multipliers (premium users spend 5x more)
+- Cross-feature integration (vintage + segments)
+
+**Conversion Funnels:**
+- Multi-stage processes with drop-off rates
+- Sequential stage progression (signup → activation → purchase)
+- Segment-based conversion variations
+- Temporal ordering guarantees
+
+**State Transitions & Churn:**
+- Markov chain state machines
+- Subscription lifecycle modeling (trial → active → churned → reactivated)
+- Terminal states and reactivation patterns
+- Segment/vintage-based churn variations
+
+**Time Series Trends:**
+- Exponential, linear, logarithmic growth/decay
+- Realistic startup growth patterns
+- Revenue forecasting support
 
 ### ✅ Comprehensive Validation
 
