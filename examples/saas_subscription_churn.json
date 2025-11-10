@@ -1,0 +1,183 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "SaaS Subscription Lifecycle with Churn",
+    "description": "Feature #4 demonstration: State transitions for subscription management. Models trial → active → paused → churned lifecycle with segment-based churn rates and reactivation patterns."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "D"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "subscription.customer_id", "to": "customer.customer_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "customer",
+      "kind": "entity",
+      "pk": "customer_id",
+      "rows": 500,
+      "segment_behavior": {
+        "segment_column": "tier",
+        "segments": {
+          "enterprise": {"base_probability": 0.10},
+          "team": {"base_probability": 0.30},
+          "individual": {"base_probability": 0.60}
+        }
+      },
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "company_name",
+          "type": "string",
+          "generator": {"faker": {"method": "company"}}
+        },
+        {
+          "name": "tier",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["enterprise", "team", "individual"],
+              "weights": [0.10, 0.30, 0.60]
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["US", "UK", "DE", "FR", "CA", "AU"],
+              "weights": [0.40, 0.20, 0.15, 0.10, 0.10, 0.05]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "subscription",
+      "kind": "fact",
+      "pk": "event_id",
+      "parents": ["customer"],
+      "state_transition_model": {
+        "initial_state": "trial",
+        "states": {
+          "trial": {
+            "transition_prob_per_period": 0.90,
+            "next_states": {
+              "active": 0.35,
+              "churned": 0.65
+            }
+          },
+          "active": {
+            "transition_prob_per_period": 0.05,
+            "next_states": {
+              "paused": 0.30,
+              "churned": 0.50,
+              "upgraded": 0.20
+            }
+          },
+          "paused": {
+            "transition_prob_per_period": 0.40,
+            "next_states": {
+              "active": 0.50,
+              "churned": 0.50
+            }
+          },
+          "upgraded": {
+            "transition_prob_per_period": 0.02,
+            "next_states": {
+              "active": 0.70,
+              "churned": 0.30
+            }
+          },
+          "churned": {
+            "terminal": true
+          }
+        },
+        "period_unit": "month",
+        "max_transitions": 20,
+        "segment_variation": {
+          "enterprise": {"churn_multiplier": 0.3},
+          "team": {"churn_multiplier": 0.7},
+          "individual": {"churn_multiplier": 1.5}
+        },
+        "vintage_variation": {
+          "churn_multiplier_curve": [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.45, 0.40, 0.35, 0.30]
+        }
+      },
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "customer_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "customer.customer_id"}}
+        },
+        {
+          "name": "current_state",
+          "type": "string",
+          "generator": {"choice": {"choices": ["trial"]}}
+        },
+        {
+          "name": "previous_state",
+          "type": "string",
+          "nullable": true,
+          "generator": {"choice": {"choices": [""]}}
+        },
+        {
+          "name": "state_changed_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "mrr",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {"mean": 4.0, "sigma": 0.8},
+              "clamp": [10, 5000]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

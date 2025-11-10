@@ -227,6 +227,10 @@ class DatasetExecutor:
         if node.stage_config:
             return self._generate_fact_with_stages(node, parent_df, parent_node)
 
+        # Check if this is a state transition model (Feature #4)
+        if node.state_transition_model:
+            return self._generate_fact_with_state_transitions(node, parent_df, parent_node)
+
         # Sample fanout for each parent row
         if node.fanout:
             fanout_counts = self._sample_fanout(node, len(parent_df))
@@ -603,6 +607,150 @@ class DatasetExecutor:
                 if "timestamp" in stage_events.columns:
                     context["_timestamp"] = stage_events["timestamp"].values
 
+                values = apply_modifiers(values, col.modifiers, col_rng, context)
+
+            # Store column
+            data[col.name] = values
+
+        df = pd.DataFrame(data)
+        return df
+
+    def _generate_fact_with_state_transitions(
+        self,
+        node: Node,
+        parent_df: pd.DataFrame,
+        parent_node: Node
+    ) -> pd.DataFrame:
+        """
+        Generate fact table using state transition model (Feature #4).
+
+        Generates state transition events for each parent entity over time.
+        """
+        logger.debug(f"  Using state transition model for '{node.id}'")
+
+        from .state_transition_utils import simulate_state_transitions, get_current_states
+
+        # Find parent ID column
+        parent_id_col = None
+        for col in parent_df.columns:
+            if col.endswith("_id") or col == "id":
+                parent_id_col = col
+                break
+
+        if not parent_id_col:
+            raise ValueError(f"Could not identify parent ID column in {parent_node.id}")
+
+        # Find parent created_at column for temporal ordering
+        created_at_col = None
+        for col in parent_df.columns:
+            col_lower = col.lower()
+            if any(kw in col_lower for kw in ['created', 'joined', 'signup', 'registered']):
+                if pd.api.types.is_datetime64_any_dtype(parent_df[col]):
+                    created_at_col = col
+                    break
+
+        # Get segment column from parent if available
+        parent_segment_col = None
+        if parent_node.segment_behavior:
+            segment_config = parent_node.segment_behavior
+            segment_col_name = segment_config.get("segment_column")
+            if segment_col_name and segment_col_name in parent_df.columns:
+                parent_segment_col = segment_col_name
+
+        # Simulate state transitions
+        rng = self.seed_manager.node_rng(node.id)
+
+        # Convert timeframe dates to Timestamp if they exist
+        timeframe_start = None
+        timeframe_end = None
+        if self.dataset.timeframe:
+            timeframe_start = pd.Timestamp(self.dataset.timeframe.start, tz='UTC') if self.dataset.timeframe.start else None
+            timeframe_end = pd.Timestamp(self.dataset.timeframe.end, tz='UTC') if self.dataset.timeframe.end else None
+
+        transitions = simulate_state_transitions(
+            parent_df=parent_df,
+            state_model=node.state_transition_model,
+            parent_id_col=parent_id_col,
+            parent_created_at_col=created_at_col,
+            parent_segment_col=parent_segment_col,
+            timeframe_start=timeframe_start,
+            timeframe_end=timeframe_end,
+            vintage_behavior=parent_node.vintage_behavior,
+            rng=rng
+        )
+
+        logger.debug(f"  Generated {len(transitions)} state transition events")
+
+        if transitions.empty:
+            # Return empty DataFrame with schema
+            return pd.DataFrame({col.name: [] for col in node.columns})
+
+        # Build fact table from transitions
+        n_rows = len(transitions)
+        parent_indices = transitions[parent_id_col].map(
+            {parent_df.iloc[i][parent_id_col]: i for i in range(len(parent_df))}
+        ).values
+
+        data = {}
+
+        # Generate columns
+        for col in node.columns:
+            col_rng = self.seed_manager.column_rng(node.id, col.name)
+
+            # Check if this is the PK column
+            if col.name == node.pk:
+                data[col.name] = np.arange(1, n_rows + 1)
+                continue
+
+            # Check if this is current_state or state column
+            col_lower = col.name.lower()
+            if "current" in col_lower and "state" in col_lower and "to_state" in transitions.columns:
+                # Use to_state from transitions
+                data[col.name] = transitions["to_state"].values
+                continue
+            elif col.name == "state" and "to_state" in transitions.columns:
+                # Use to_state for simple "state" column
+                data[col.name] = transitions["to_state"].values
+                continue
+
+            # Check if this is previous_state or from_state column
+            if ("previous" in col_lower or "from" in col_lower) and "state" in col_lower and "from_state" in transitions.columns:
+                data[col.name] = transitions["from_state"].values
+                continue
+
+            # Check if this is a transition timestamp column
+            col_lower = col.name.lower()
+            if col.type == "datetime" and any(kw in col_lower for kw in ['time', 'date', 'changed', 'transitioned']):
+                data[col.name] = transitions["transition_time"].values
+                continue
+
+            # Check if this is a parent FK (lookup generator)
+            if isinstance(col.generator, dict) and "lookup" in col.generator:
+                lookup_spec = col.generator["lookup"]
+                from_ref = lookup_spec.get("from", "")
+
+                # Check if it's the primary parent
+                if from_ref.startswith(f"{parent_node.id}."):
+                    parent_pk_col = from_ref.split(".")[1]
+                    if parent_pk_col in parent_df.columns:
+                        data[col.name] = parent_df[parent_pk_col].values[parent_indices]
+                        continue
+
+            # Generate values using regular generators
+            values = self.registry.generate(
+                col.generator,
+                n_rows,
+                col_rng,
+                timeframe=self.dataset.timeframe
+            )
+
+            # Apply modifiers if present
+            if col.modifiers:
+                context = GenerationContext(
+                    tables=self.generated_data,
+                    timeframe=self.dataset.timeframe,
+                    node=node
+                )
                 values = apply_modifiers(values, col.modifiers, col_rng, context)
 
             # Store column
