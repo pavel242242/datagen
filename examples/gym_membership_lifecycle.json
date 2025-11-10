@@ -1,0 +1,183 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Gym Membership Lifecycle with Seasonal Churn",
+    "description": "Feature #4: State transitions for gym memberships. Models active → frozen → cancelled → reactivated lifecycle with seasonal patterns (January signups, summer cancellations)."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "D"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "membership.member_id", "to": "member.member_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "member",
+      "kind": "entity",
+      "pk": "member_id",
+      "rows": 800,
+      "segment_behavior": {
+        "segment_column": "membership_type",
+        "segments": {
+          "premium": {"base_probability": 0.20},
+          "standard": {"base_probability": 0.50},
+          "basic": {"base_probability": 0.30}
+        }
+      },
+      "columns": [
+        {
+          "name": "member_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "full_name",
+          "type": "string",
+          "generator": {"faker": {"method": "name"}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "membership_type",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["premium", "standard", "basic"],
+              "weights": [0.20, 0.50, 0.30]
+            }
+          }
+        },
+        {
+          "name": "joined_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D",
+              "pattern": {
+                "dimension": "month",
+                "weights": [2.5, 1.2, 1.0, 0.9, 0.8, 0.7, 0.6, 0.7, 1.1, 1.0, 0.9, 1.3]
+              }
+            }
+          }
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {"mu": 35, "sigma": 12},
+              "clamp": [18, 75]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "membership",
+      "kind": "fact",
+      "pk": "status_id",
+      "parents": ["member"],
+      "state_transition_model": {
+        "initial_state": "active",
+        "states": {
+          "active": {
+            "transition_prob_per_period": 0.08,
+            "next_states": {
+              "frozen": 0.30,
+              "cancelled": 0.70
+            }
+          },
+          "frozen": {
+            "transition_prob_per_period": 0.40,
+            "next_states": {
+              "active": 0.60,
+              "cancelled": 0.40
+            }
+          },
+          "cancelled": {
+            "transition_prob_per_period": 0.05,
+            "next_states": {
+              "reactivated": 1.0
+            }
+          },
+          "reactivated": {
+            "transition_prob_per_period": 0.06,
+            "next_states": {
+              "active": 0.90,
+              "cancelled": 0.10
+            }
+          }
+        },
+        "period_unit": "month",
+        "max_transitions": 15,
+        "segment_variation": {
+          "premium": {"churn_multiplier": 0.4},
+          "standard": {"churn_multiplier": 1.0},
+          "basic": {"churn_multiplier": 1.6}
+        },
+        "vintage_variation": {
+          "churn_multiplier_curve": [1.0, 0.85, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50]
+        }
+      },
+      "columns": [
+        {
+          "name": "status_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "member_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "member.member_id"}}
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "generator": {"choice": {"choices": ["active"]}}
+        },
+        {
+          "name": "previous_status",
+          "type": "string",
+          "nullable": true,
+          "generator": {"choice": {"choices": [""]}}
+        },
+        {
+          "name": "status_changed_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "monthly_fee",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {"mu": 50, "sigma": 15},
+              "clamp": [25, 150]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -708,8 +708,8 @@ class DatasetExecutor:
                 # Use to_state from transitions
                 data[col.name] = transitions["to_state"].values
                 continue
-            elif col.name == "state" and "to_state" in transitions.columns:
-                # Use to_state for simple "state" column
+            elif (col_lower == "state" or col_lower == "status") and "to_state" in transitions.columns:
+                # Use to_state for simple "state" or "status" column
                 data[col.name] = transitions["to_state"].values
                 continue
 

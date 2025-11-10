@@ -1,0 +1,181 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "IoT Device Connectivity States",
+    "description": "Feature #4: State transitions for IoT device lifecycle. Models online → offline → maintenance → decommissioned with vintage degradation (older devices fail more often)."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "device_status.device_id", "to": "device.device_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "device",
+      "kind": "entity",
+      "pk": "device_id",
+      "rows": 300,
+      "segment_behavior": {
+        "segment_column": "device_type",
+        "segments": {
+          "industrial": {"base_probability": 0.30},
+          "commercial": {"base_probability": 0.40},
+          "consumer": {"base_probability": 0.30}
+        }
+      },
+      "columns": [
+        {
+          "name": "device_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1000, "step": 1}}
+        },
+        {
+          "name": "device_serial",
+          "type": "string",
+          "generator": {"faker": {"method": "uuid4"}}
+        },
+        {
+          "name": "device_type",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["industrial", "commercial", "consumer"],
+              "weights": [0.30, 0.40, 0.30]
+            }
+          }
+        },
+        {
+          "name": "deployed_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2023-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["warehouse_A", "warehouse_B", "factory_1", "factory_2", "retail_store", "distribution_center"],
+              "weights": [0.20, 0.20, 0.15, 0.15, 0.15, 0.15]
+            }
+          }
+        },
+        {
+          "name": "firmware_version",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["v1.2.3", "v1.3.0", "v1.3.5", "v2.0.0", "v2.1.0"],
+              "weights": [0.10, 0.15, 0.25, 0.30, 0.20]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "device_status",
+      "kind": "fact",
+      "pk": "event_id",
+      "parents": ["device"],
+      "state_transition_model": {
+        "initial_state": "online",
+        "states": {
+          "online": {
+            "transition_prob_per_period": 0.15,
+            "next_states": {
+              "offline": 0.85,
+              "maintenance": 0.15
+            }
+          },
+          "offline": {
+            "transition_prob_per_period": 0.70,
+            "next_states": {
+              "online": 0.75,
+              "maintenance": 0.20,
+              "decommissioned": 0.05
+            }
+          },
+          "maintenance": {
+            "transition_prob_per_period": 0.90,
+            "next_states": {
+              "online": 0.85,
+              "decommissioned": 0.15
+            }
+          },
+          "decommissioned": {
+            "terminal": true
+          }
+        },
+        "period_unit": "week",
+        "max_transitions": 25,
+        "segment_variation": {
+          "industrial": {"churn_multiplier": 0.5},
+          "commercial": {"churn_multiplier": 1.0},
+          "consumer": {"churn_multiplier": 1.8}
+        },
+        "vintage_variation": {
+          "churn_multiplier_curve": [0.5, 0.7, 0.9, 1.0, 1.2, 1.5, 1.8, 2.2, 2.5, 3.0]
+        }
+      },
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "device_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "device.device_id"}}
+        },
+        {
+          "name": "connection_state",
+          "type": "string",
+          "generator": {"choice": {"choices": ["online"]}}
+        },
+        {
+          "name": "previous_state",
+          "type": "string",
+          "nullable": true,
+          "generator": {"choice": {"choices": [""]}}
+        },
+        {
+          "name": "state_timestamp",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "signal_strength",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "normal",
+              "params": {"mu": 75, "sigma": 15},
+              "clamp": [20, 100]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
