@@ -1,0 +1,450 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Comprehensive SaaS Analytics Platform",
+    "description": "Complete SaaS business with all Phase 4 features: vintage effects, segmentation, multi-stage onboarding, subscription lifecycle, attribution chains, feature adoption curves, and revenue trends"
+  },
+  "timeframe": {
+    "start": "2023-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "H"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "onboarding_stage.account_id", "to": "account.account_id"},
+      {"from": "subscription_event.account_id", "to": "account.account_id"},
+      {"from": "payment.account_id", "to": "account.account_id"},
+      {"from": "feature_adoption.account_id", "to": "account.account_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "account",
+      "kind": "entity",
+      "pk": "account_id",
+      "rows": 800,
+      "columns": [
+        {
+          "name": "account_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "company_name",
+          "type": "string",
+          "generator": {"faker": {"method": "company"}}
+        },
+        {
+          "name": "industry",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["technology", "healthcare", "finance", "retail", "education", "manufacturing"],
+              "weights": [0.3, 0.2, 0.2, 0.15, 0.1, 0.05]
+            }
+          }
+        },
+        {
+          "name": "plan_tier",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["starter", "professional", "enterprise"],
+              "weights": [0.5, 0.35, 0.15]
+            }
+          }
+        },
+        {
+          "name": "team_size",
+          "type": "int",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {"mu": 2.5, "sigma": 1.2},
+              "clamp": [1, 500]
+            }
+          }
+        },
+        {
+          "name": "signup_source",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["organic_search", "paid_search", "referral", "content_marketing", "sales_outreach", "partner"],
+              "weights": [0.25, 0.2, 0.15, 0.2, 0.15, 0.05]
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2023-01-01T00:00:00Z", "end": "2024-10-31T23:59:59Z"},
+              "freq": "D",
+              "pattern": {
+                "dimension": "month",
+                "weights": [0.8, 0.9, 1.0, 1.1, 1.0, 0.9, 0.7, 0.8, 1.2, 1.3, 1.1, 1.0]
+              }
+            }
+          }
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["US", "UK", "CA", "AU", "DE", "FR", "NL", "SG"],
+              "weights": [0.45, 0.15, 0.12, 0.08, 0.07, 0.05, 0.04, 0.04]
+            }
+          }
+        }
+      ],
+      "segment_behavior": {
+        "starter": {
+          "fanout_multiplier": 0.6,
+          "value_multiplier": 0.4
+        },
+        "professional": {
+          "fanout_multiplier": 1.0,
+          "value_multiplier": 1.0
+        },
+        "enterprise": {
+          "fanout_multiplier": 2.5,
+          "value_multiplier": 4.0
+        }
+      },
+      "vintage_behavior": {
+        "age_based_multipliers": {
+          "activity_decay": {
+            "curve": [1.2, 1.1, 1.0, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55],
+            "time_unit": "month",
+            "applies_to": "fanout"
+          },
+          "expansion_revenue": {
+            "curve": {
+              "type": "logarithmic",
+              "params": {"a": 1.0, "b": 0.08}
+            },
+            "time_unit": "month",
+            "applies_to": ["monthly_spend"]
+          }
+        }
+      }
+    },
+    {
+      "id": "onboarding_stage",
+      "kind": "fact",
+      "pk": "stage_event_id",
+      "parents": ["account"],
+      "stage_config": {
+        "stages": [
+          {"stage_name": "signed_up", "transition_rate": 1.0},
+          {"stage_name": "email_verified", "transition_rate": 0.85},
+          {"stage_name": "team_invited", "transition_rate": 0.72},
+          {"stage_name": "first_project_created", "transition_rate": 0.65},
+          {"stage_name": "integration_connected", "transition_rate": 0.55},
+          {"stage_name": "activated", "transition_rate": 0.48}
+        ],
+        "time_between_stages_hours": 24,
+        "segment_variation": {
+          "enterprise": {"transition_multiplier": 1.4},
+          "professional": {"transition_multiplier": 1.1},
+          "starter": {"transition_multiplier": 0.7}
+        }
+      },
+      "columns": [
+        {
+          "name": "stage_event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "account_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "account.account_id"}}
+        },
+        {
+          "name": "stage_name",
+          "type": "string",
+          "generator": {"choice": {"choices": ["signed_up"]}}
+        },
+        {
+          "name": "stage_completed_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2023-01-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "freq": "H"
+            }
+          }
+        },
+        {
+          "name": "completion_source",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["web_app", "mobile_app", "email_link", "api", "admin_action"],
+              "weights": [0.6, 0.2, 0.1, 0.05, 0.05]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "subscription_event",
+      "kind": "fact",
+      "pk": "subscription_event_id",
+      "parents": ["account"],
+      "state_transition_model": {
+        "initial_state": "trial",
+        "states": {
+          "trial": {
+            "transition_prob_per_period": 0.90,
+            "next_states": {
+              "active": 0.42,
+              "churned": 0.58
+            }
+          },
+          "active": {
+            "transition_prob_per_period": 0.08,
+            "next_states": {
+              "upgraded": 0.25,
+              "downgraded": 0.15,
+              "paused": 0.20,
+              "churned": 0.40
+            }
+          },
+          "upgraded": {
+            "transition_prob_per_period": 0.04,
+            "next_states": {
+              "active": 0.70,
+              "churned": 0.30
+            }
+          },
+          "downgraded": {
+            "transition_prob_per_period": 0.12,
+            "next_states": {
+              "active": 0.50,
+              "churned": 0.50
+            }
+          },
+          "paused": {
+            "transition_prob_per_period": 0.35,
+            "next_states": {
+              "active": 0.60,
+              "churned": 0.40
+            }
+          },
+          "churned": {
+            "transition_prob_per_period": 0.03,
+            "next_states": {
+              "reactivated": 1.0
+            }
+          },
+          "reactivated": {
+            "transition_prob_per_period": 0.10,
+            "next_states": {
+              "active": 0.80,
+              "churned": 0.20
+            }
+          }
+        },
+        "period_unit": "month",
+        "max_transitions": 24,
+        "segment_variation": {
+          "enterprise": {"churn_multiplier": 0.3},
+          "professional": {"churn_multiplier": 0.8},
+          "starter": {"churn_multiplier": 1.6}
+        },
+        "vintage_variation": {
+          "churn_multiplier_curve": [1.2, 1.0, 0.85, 0.75, 0.65, 0.60, 0.55, 0.50, 0.45, 0.42, 0.40, 0.38]
+        }
+      },
+      "columns": [
+        {
+          "name": "subscription_event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "account_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "account.account_id"}}
+        },
+        {
+          "name": "subscription_state",
+          "type": "string",
+          "generator": {"choice": {"choices": ["trial"]}}
+        },
+        {
+          "name": "previous_state",
+          "type": "string",
+          "nullable": true,
+          "generator": {"choice": {"choices": [""]}}
+        },
+        {
+          "name": "state_changed_at",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2023-01-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["automatic", "user_action", "payment_failed", "admin_action", "support_intervention"],
+              "weights": [0.5, 0.3, 0.1, 0.05, 0.05]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "payment",
+      "kind": "fact",
+      "pk": "payment_id",
+      "parents": ["account"],
+      "fanout": {"distribution": "poisson", "lambda": 6.0},
+      "attribution_chain": {
+        "channels": ["organic_search", "paid_search", "social_media", "content_marketing", "email_campaign", "webinar", "referral", "sales_call", "partner"],
+        "min_touches": 2,
+        "max_touches": 8,
+        "time_window_days": 90,
+        "attribution_model": "time_decay",
+        "time_decay_halflife_days": 21,
+        "touchpoint_table_name": "marketing_touchpoint"
+      },
+      "columns": [
+        {
+          "name": "payment_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "account_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "account.account_id"}}
+        },
+        {
+          "name": "payment_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {"start": "2023-01-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "freq": "D"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "float",
+          "generator": {
+            "distribution": {
+              "type": "lognormal",
+              "params": {"mu": 5.5, "sigma": 1.1},
+              "clamp": [29, 10000]
+            }
+          },
+          "modifiers": [
+            {
+              "transform": "trend",
+              "args": {
+                "type": "exponential",
+                "growth_rate": 0.12,
+                "time_reference": "payment_date"
+              }
+            },
+            {
+              "transform": "seasonality",
+              "args": {
+                "dimension": "month",
+                "weights": [0.9, 0.85, 1.0, 1.1, 1.05, 1.0, 0.8, 0.75, 1.1, 1.2, 1.15, 1.3]
+              }
+            },
+            {
+              "transform": "jitter",
+              "args": {"std": 0.03, "mode": "add"}
+            }
+          ]
+        },
+        {
+          "name": "payment_method",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["credit_card", "bank_transfer", "paypal", "invoice"],
+              "weights": [0.65, 0.15, 0.12, 0.08]
+            }
+          }
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["USD", "EUR", "GBP", "AUD", "CAD"],
+              "weights": [0.65, 0.15, 0.1, 0.05, 0.05]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "feature_adoption",
+      "kind": "fact",
+      "pk": "adoption_id",
+      "parents": ["account"],
+      "fanout": {"distribution": "poisson", "lambda": 3.5},
+      "columns": [
+        {
+          "name": "adoption_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "account_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "account.account_id"}}
+        },
+        {
+          "name": "feature_name",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["api_access", "advanced_analytics", "custom_branding", "sso", "data_export", "webhooks", "audit_logs", "advanced_permissions"],
+              "weights": [0.25, 0.2, 0.15, 0.15, 0.1, 0.08, 0.04, 0.03]
+            }
+          }
+        },
+        {
+          "name": "adopted_at",
+          "type": "datetime",
+          "generator": {
+            "diffusion_curve": {
+              "within": {"start": "2023-02-01T00:00:00Z", "end": "2024-12-31T23:59:59Z"},
+              "curve_type": "logistic",
+              "inflection_point": 0.45,
+              "steepness": 8.0
+            }
+          }
+        },
+        {
+          "name": "usage_frequency",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["daily", "weekly", "monthly", "rarely"],
+              "weights": [0.15, 0.35, 0.35, 0.15]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

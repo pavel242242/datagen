@@ -113,11 +113,14 @@ def simulate_state_transitions(
         # Get parent created_at (start of their timeline)
         if parent_created_at_col and parent_created_at_col in parent_df.columns:
             start_time = parent_df.iloc[parent_idx][parent_created_at_col]
+            # Ensure timezone-aware (match timeframe)
+            if hasattr(start_time, 'tz') and start_time.tz is None:
+                start_time = start_time.tz_localize('UTC')
         elif timeframe_start:
             start_time = timeframe_start
         else:
             # Fallback: use current time
-            start_time = pd.Timestamp.now()
+            start_time = pd.Timestamp.now(tz='UTC')
 
         # Get segment for this parent
         segment = None
