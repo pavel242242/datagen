@@ -17,6 +17,10 @@ from datagen.core.vintage_utils import (
     apply_vintage_multipliers_to_fanout,
     apply_vintage_multipliers_to_values,
 )
+from datagen.core.stage_utils import (
+    calculate_stage_progression,
+    generate_stage_events,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +222,10 @@ class DatasetExecutor:
             f"Generating fact '{node.id}' from parent '{primary_parent_id}' "
             f"({len(parent_df)} parent rows)"
         )
+
+        # Check if this is a multi-stage process (Feature #3)
+        if node.stage_config:
+            return self._generate_fact_with_stages(node, parent_df, parent_node)
 
         # Sample fanout for each parent row
         if node.fanout:
@@ -484,6 +492,124 @@ class DatasetExecutor:
             return result.values
 
         return result
+
+    def _generate_fact_with_stages(
+        self,
+        node: Node,
+        parent_df: pd.DataFrame,
+        parent_node: Node
+    ) -> pd.DataFrame:
+        """
+        Generate fact table using multi-stage process logic (Feature #3).
+
+        Instead of using fanout, generates events for each stage a parent entity reaches.
+        """
+        logger.debug(f"  Using multi-stage process for '{node.id}'")
+
+        # Get segment column from parent if available
+        parent_segment_col = None
+        if parent_node.segment_behavior:
+            segment_config = parent_node.segment_behavior
+            segment_col_name = segment_config.get("segment_column")
+            if segment_col_name and segment_col_name in parent_df.columns:
+                parent_segment_col = segment_col_name
+
+        # Calculate stage progression for each parent
+        rng = self.seed_manager.node_rng(node.id)
+        stage_progression = calculate_stage_progression(
+            parent_df,
+            node.stage_config,
+            parent_segment_col=parent_segment_col,
+            rng=rng
+        )
+
+        # Find timestamp column in parent for temporal ordering
+        timestamp_col = None
+        for col in parent_df.columns:
+            if pd.api.types.is_datetime64_any_dtype(parent_df[col]):
+                timestamp_col = col
+                break
+
+        # Generate stage events
+        stage_events = generate_stage_events(
+            parent_df,
+            stage_progression,
+            node.stage_config,
+            pk_start=1,
+            timestamp_col=timestamp_col,
+            time_between_stages_hours=24.0,  # TODO: Make configurable
+            rng=rng
+        )
+
+        logger.debug(f"  Generated {len(stage_events)} stage events")
+
+        # Now generate the actual fact table columns
+        # Build mapping from event to parent
+        parent_indices = stage_events["parent_index"].values
+        n_rows = len(stage_events)
+
+        data = {}
+
+        # Generate columns
+        for col in node.columns:
+            col_rng = self.seed_manager.column_rng(node.id, col.name)
+
+            # Check if this is the PK column (use event_id from stage_events)
+            if col.name == node.pk:
+                data[col.name] = stage_events["event_id"].values
+                continue
+
+            # Check if this is a stage_name column
+            if col.name == "stage_name" and "stage_name" in stage_events.columns:
+                data[col.name] = stage_events["stage_name"].values
+                continue
+
+            # Check if this is a stage_index column
+            if col.name == "stage_index" and "stage_index" in stage_events.columns:
+                data[col.name] = stage_events["stage_index"].values
+                continue
+
+            # Check if this is a timestamp column from stage_events
+            if col.name == "timestamp" and "timestamp" in stage_events.columns:
+                data[col.name] = stage_events["timestamp"].values
+                continue
+
+            # Check if this is a parent FK (lookup generator)
+            if isinstance(col.generator, dict) and "lookup" in col.generator:
+                # Generate FK values
+                lookup_spec = col.generator["lookup"]
+                from_ref = lookup_spec.get("from", "")
+
+                # Check if it's the primary parent
+                if from_ref.startswith(f"{parent_node.id}."):
+                    # Use parent indices to map to parent PK
+                    parent_pk_col = from_ref.split(".")[1]
+                    if parent_pk_col in parent_df.columns:
+                        data[col.name] = parent_df[parent_pk_col].values[parent_indices]
+                        continue
+
+            # Generate values using regular generators
+            values = self.registry.generate(
+                col.generator,
+                n_rows,
+                col_rng,
+                timeframe=self.dataset.timeframe
+            )
+
+            # Apply modifiers if present
+            if col.modifiers:
+                # Create context DataFrame for modifiers
+                context = pd.DataFrame(data) if data else pd.DataFrame()
+                if "timestamp" in stage_events.columns:
+                    context["_timestamp"] = stage_events["timestamp"].values
+
+                values = apply_modifiers(values, col.modifiers, col_rng, context)
+
+            # Store column
+            data[col.name] = values
+
+        df = pd.DataFrame(data)
+        return df
 
     def _sample_fanout(self, node: Node, n_parents: int) -> np.ndarray:
         """Sample fanout counts for parents."""

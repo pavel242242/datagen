@@ -1,0 +1,167 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "E-Commerce Conversion Funnel - Multi-Stage Process Demo",
+    "description": "Demonstrates Feature #3: Multi-Stage Processes for conversion funnel analysis. Tracks users through signup → browsing → add_to_cart → checkout → purchase stages with segment-based conversion rates."
+  },
+  "timeframe": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-12-31T23:59:59Z",
+    "freq": "h"
+  },
+  "constraints": {
+    "foreign_keys": [
+      {"from": "user_journey.user_id", "to": "user.user_id"}
+    ]
+  },
+  "nodes": [
+    {
+      "id": "user",
+      "kind": "entity",
+      "pk": "user_id",
+      "rows": 1000,
+      "segment_behavior": {
+        "segment_column": "customer_segment",
+        "segments": {
+          "high_intent": {"base_probability": 0.15},
+          "medium_intent": {"base_probability": 0.55},
+          "low_intent": {"base_probability": 0.30}
+        }
+      },
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "generator": {"faker": {"method": "email"}}
+        },
+        {
+          "name": "customer_segment",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["high_intent", "medium_intent", "low_intent"],
+              "weights": [0.15, 0.55, 0.30]
+            }
+          }
+        },
+        {
+          "name": "signup_date",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "h",
+              "pattern": {
+                "dimension": "dow",
+                "weights": [1.0, 1.0, 1.0, 1.0, 1.2, 1.5, 1.3]
+              }
+            }
+          }
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["US", "UK", "DE", "FR", "CA"],
+              "weights": [0.4, 0.2, 0.15, 0.15, 0.1]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "user_journey",
+      "kind": "fact",
+      "pk": "event_id",
+      "parents": ["user"],
+      "stage_config": {
+        "stages": [
+          {
+            "stage_name": "signup",
+            "transition_rate": 1.0
+          },
+          {
+            "stage_name": "browsing",
+            "transition_rate": 0.75
+          },
+          {
+            "stage_name": "add_to_cart",
+            "transition_rate": 0.45
+          },
+          {
+            "stage_name": "checkout",
+            "transition_rate": 0.80
+          },
+          {
+            "stage_name": "purchase",
+            "transition_rate": 0.85
+          }
+        ],
+        "segment_variation": {
+          "high_intent": {"transition_multiplier": 1.4},
+          "medium_intent": {"transition_multiplier": 1.0},
+          "low_intent": {"transition_multiplier": 0.65}
+        }
+      },
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "int",
+          "generator": {"sequence": {"start": 1, "step": 1}}
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "generator": {"lookup": {"from": "user.user_id"}}
+        },
+        {
+          "name": "stage_name",
+          "type": "string",
+          "generator": {"choice": {"choices": ["signup"]}}
+        },
+        {
+          "name": "stage_index",
+          "type": "int",
+          "generator": {"sequence": {"start": 0, "step": 1}}
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "generator": {
+            "datetime_series": {
+              "within": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-12-31T23:59:59Z"
+              },
+              "freq": "h"
+            }
+          }
+        },
+        {
+          "name": "session_id",
+          "type": "string",
+          "generator": {"faker": {"method": "uuid4"}}
+        },
+        {
+          "name": "device_type",
+          "type": "string",
+          "generator": {
+            "choice": {
+              "choices": ["desktop", "mobile", "tablet"],
+              "weights": [0.45, 0.45, 0.10]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
