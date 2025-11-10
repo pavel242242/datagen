@@ -101,20 +101,25 @@
         }
       ],
       "segment_behavior": {
-        "starter": {
-          "fanout_multiplier": 0.6,
-          "value_multiplier": 0.4
-        },
-        "professional": {
-          "fanout_multiplier": 1.0,
-          "value_multiplier": 1.0
-        },
-        "enterprise": {
-          "fanout_multiplier": 2.5,
-          "value_multiplier": 4.0
+        "segment_column": "plan_tier",
+        "applies_to_columns": ["amount"],
+        "behaviors": {
+          "starter": {
+            "fanout_multiplier": 0.6,
+            "value_multiplier": 0.4
+          },
+          "professional": {
+            "fanout_multiplier": 1.0,
+            "value_multiplier": 1.0
+          },
+          "enterprise": {
+            "fanout_multiplier": 2.5,
+            "value_multiplier": 4.0
+          }
         }
       },
       "vintage_behavior": {
+        "created_at_column": "created_at",
         "age_based_multipliers": {
           "activity_decay": {
             "curve": [1.2, 1.1, 1.0, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55],
@@ -275,13 +280,13 @@
         {
           "name": "subscription_state",
           "type": "string",
-          "generator": {"choice": {"choices": ["trial"]}}
+          "generator": {"choice": {"choices": ["trial", "active", "upgraded", "downgraded", "paused", "churned", "reactivated"]}}
         },
         {
           "name": "previous_state",
           "type": "string",
           "nullable": true,
-          "generator": {"choice": {"choices": [""]}}
+          "generator": {"choice": {"choices": ["trial", "active", "upgraded", "downgraded", "paused", "churned", "reactivated", ""]}}
         },
         {
           "name": "state_changed_at",

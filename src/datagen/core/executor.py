@@ -384,6 +384,12 @@ class DatasetExecutor:
                     if not pd.api.types.is_datetime64_any_dtype(parent_created_series):
                         parent_created_series = pd.to_datetime(parent_created_series)
 
+                    # Normalize timezones to enable comparison
+                    if hasattr(values_series.dtype, 'tz') and values_series.dt.tz is not None:
+                        values_series = values_series.dt.tz_localize(None)
+                    if hasattr(parent_created_series.dtype, 'tz') and parent_created_series.dt.tz is not None:
+                        parent_created_series = parent_created_series.dt.tz_localize(None)
+
                     # Find violations (fact timestamp < parent created_at)
                     violations = values_series < parent_created_series
 
@@ -717,9 +723,16 @@ class DatasetExecutor:
                 data[col.name] = transitions["to_state"].values
                 continue
 
-            # Check if this is previous_state or from_state column
+            # Check if this is previous_state or from_state column FIRST (before general state check)
             if ("previous" in col_lower or "from" in col_lower) and "state" in col_lower and "from_state" in transitions.columns:
                 data[col.name] = transitions["from_state"].values
+                continue
+
+            # General state column check (e.g., subscription_state, payment_state, etc.)
+            # Exclude datetime columns (e.g., state_changed_at) - those are handled later
+            if "state" in col_lower and col.type != "datetime" and "to_state" in transitions.columns:
+                # Use to_state for any column with "state" in name
+                data[col.name] = transitions["to_state"].values
                 continue
 
             # Check if this is a transition timestamp column
@@ -825,6 +838,101 @@ class DatasetExecutor:
                     col_rng,
                     context_df
                 )
+
+            # Apply temporal constraints: fact timestamps must be >= parent created_at
+            if (
+                col.type in ["datetime", "date"]
+                and parent_node
+                and parent_node.vintage_behavior
+            ):
+                vintage_config = parent_node.vintage_behavior
+                created_at_col = vintage_config.get("created_at_column")
+
+                if created_at_col and created_at_col in parent_df.columns:
+                    # Get parent indices for each child row
+                    parent_indices = np.repeat(np.arange(len(parent_df)), fanout_counts)
+
+                    # Get parent created_at timestamps for each child row
+                    parent_created_at = parent_df[created_at_col].values[parent_indices]
+
+                    # Convert to pandas Series for easier datetime handling
+                    values_series = pd.Series(values)
+                    parent_created_series = pd.Series(parent_created_at)
+
+                    # Ensure both are datetime
+                    if not pd.api.types.is_datetime64_any_dtype(values_series):
+                        values_series = pd.to_datetime(values_series)
+                    if not pd.api.types.is_datetime64_any_dtype(parent_created_series):
+                        parent_created_series = pd.to_datetime(parent_created_series)
+
+                    # Normalize timezones to enable comparison
+                    if hasattr(values_series.dtype, 'tz') and values_series.dt.tz is not None:
+                        values_series = values_series.dt.tz_localize(None)
+                    if hasattr(parent_created_series.dtype, 'tz') and parent_created_series.dt.tz is not None:
+                        parent_created_series = parent_created_series.dt.tz_localize(None)
+
+                    # Find violations (fact timestamp < parent created_at)
+                    violations = values_series < parent_created_series
+
+                    if violations.any():
+                        # Resample violated timestamps from [parent_created_at, timeframe.end]
+                        n_violations = violations.sum()
+                        logger.debug(
+                            f"  Fixing {n_violations} temporal violations in {node.id}.{col.name}"
+                        )
+
+                        # Use timeframe end as upper bound
+                        if self.dataset.timeframe:
+                            end_time = pd.to_datetime(self.dataset.timeframe.end)
+                        else:
+                            # Fallback to max of current values
+                            end_time = values_series.max()
+
+                        # Normalize timezone of end_time to match parent_created
+                        if hasattr(end_time, "tz") and end_time.tz is not None:
+                            end_time = end_time.tz_localize(None)
+
+                        # For each violation, sample uniformly between parent_created_at and end_time
+                        for idx in violations[violations].index:
+                            parent_created = parent_created_series.iloc[idx]
+                            # Random timestamp between parent_created and end_time
+                            time_range = (end_time - parent_created).total_seconds()
+                            if time_range > 0:
+                                random_offset = pd.Timedelta(
+                                    seconds=col_rng.uniform(0, time_range)
+                                )
+                                values_series.iloc[idx] = parent_created + random_offset
+                            else:
+                                # If parent_created >= end_time, just use parent_created
+                                values_series.iloc[idx] = parent_created
+
+                        values = values_series.values
+
+            # Apply segment-based value multipliers if applicable
+            if (
+                parent_node
+                and parent_node.segment_behavior
+                and col.type in ["int", "float"]
+            ):
+                segment_config = parent_node.segment_behavior
+                applies_to = segment_config.get("applies_to_columns", [])
+
+                # Apply value multiplier if this column is in the applies_to list
+                if col.name in applies_to:
+                    # Get parent indices for each child row
+                    parent_indices = np.repeat(np.arange(len(parent_df)), fanout_counts)
+
+                    # Get segment column name
+                    segment_column = segment_config.get("segment_column")
+                    if segment_column and segment_column in parent_df.columns:
+                        # Get parent segment values for each child row
+                        parent_segment_values = parent_df[segment_column].values[parent_indices]
+
+                        # Apply multipliers
+                        behaviors = segment_config.get("behaviors", {})
+                        values = self._apply_segment_value_multipliers(
+                            values, parent_segment_values, behaviors
+                        )
 
             data[col.name] = values
 
