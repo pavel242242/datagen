@@ -187,6 +187,140 @@ def validate(schema_path, data_dir, output):
 
 
 @cli.command()
+@click.argument('data_dir', type=click.Path(exists=True))
+@click.option('--schema', '-s', type=click.Path(exists=True), help='Original JSON schema (optional but recommended)')
+@click.option('--personas', '-p', help='Comma-separated personas (e.g., "vp_growth,data_engineer")')
+@click.option('--output', '-o', type=click.Path(), help='Output file for crunch report (JSON)')
+@click.option('--verbose', '-v', is_flag=True, help='Show detailed analysis progress')
+def crunch(data_dir, schema, personas, output, verbose):
+    """Analyze generated data with DuckDB analysts using multiple personas."""
+    from rich.console import Console
+    from pathlib import Path
+    from datagen.datacruncher import DataCruncher, AnalysisConfig, list_personas
+
+    console = Console()
+
+    console.print(f"\n[bold blue]🔍 DATACRUNCHER: Multi-Persona Data Quality Analysis[/bold blue]")
+    console.print(f"[bold blue]📁 Data directory:[/bold blue] {data_dir}")
+
+    # Parse personas
+    if personas:
+        persona_list = [p.strip() for p in personas.split(",")]
+    else:
+        persona_list = ["data_engineer", "vp_growth"]  # Default
+
+    console.print(f"[bold blue]👥 Personas:[/bold blue] {', '.join(persona_list)}")
+
+    # Validate personas
+    available_personas = list_personas()
+    for persona in persona_list:
+        if persona not in available_personas:
+            console.print(f"[bold red]❌ Unknown persona:[/bold red] {persona}")
+            console.print(f"[yellow]Available personas:[/yellow] {', '.join(available_personas)}")
+            raise SystemExit(1)
+
+    if schema:
+        console.print(f"[bold blue]📋 Schema:[/bold blue] {schema}")
+
+    # Create config
+    config = AnalysisConfig(
+        data_dir=Path(data_dir),
+        schema_path=Path(schema) if schema else None,
+        personas=persona_list,
+        verbose=verbose,
+    )
+
+    # Run analysis
+    try:
+        console.print(f"\n[bold cyan]🔧 Running analysis...[/bold cyan]")
+
+        cruncher = DataCruncher(config)
+        report = cruncher.analyze()
+
+        # Print summary to console
+        report.print_summary()
+
+        # Save to file if requested
+        if output:
+            output_path = Path(output)
+            report.save(output_path)
+            console.print(f"[bold green]📄 Report saved to:[/bold green] {output}")
+        else:
+            # Print JSON to stdout if no output file
+            console.print(f"\n[dim]JSON Report:[/dim]")
+            click.echo(report.to_json())
+
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Analysis failed:[/bold red]")
+        console.print(f"[red]{e}[/red]")
+        import traceback
+        traceback.print_exc()
+        raise SystemExit(1)
+
+
+@cli.command()
+@click.argument('crunch_report', type=click.Path(exists=True))
+@click.option('--path', type=click.Choice(['schema', 'postprocess', 'approve', 'auto']), default='auto', help='Resolution path to take')
+@click.option('--output-dir', '-o', type=click.Path(), help='Output directory for generated files')
+@click.option('--force', is_flag=True, help='Force resolution even if quality checks fail')
+@click.option('--postprocess-format', type=click.Choice(['duckdb', 'polars']), default='duckdb', help='Format for postprocessing script')
+def polish(crunch_report, path, output_dir, force, postprocess_format):
+    """Resolve datacruncher findings through schema improvement, postprocessing, or approval."""
+    from rich.console import Console
+    from pathlib import Path
+    from datagen.datapolisher import DataPolisher, PolishConfig
+
+    console = Console()
+
+    console.print(f"\n[bold blue]✨ DATAPOLISHER: Resolving Datacruncher Findings[/bold blue]")
+    console.print(f"[bold blue]📄 Crunch report:[/bold blue] {crunch_report}")
+    console.print(f"[bold blue]🛤️  Resolution path:[/bold blue] {path}")
+
+    # Create config
+    config = PolishConfig(
+        crunch_report_path=Path(crunch_report),
+        output_dir=Path(output_dir) if output_dir else None,
+        path=path,
+        force=force,
+        postprocess_format=postprocess_format,
+    )
+
+    # Run polisher
+    try:
+        console.print(f"\n[bold cyan]🔧 Analyzing issues and determining resolution...[/bold cyan]")
+
+        polisher = DataPolisher(config)
+        result = polisher.polish()
+
+        # Print results
+        path_taken = result["path_taken"]
+        files_generated = result["files_generated"]
+        summary = result["summary"]
+
+        console.print(f"\n[bold green]✅ Resolution complete![/bold green]")
+        console.print(f"[bold cyan]Path taken:[/bold cyan] {path_taken}")
+
+        if "changes_made" in result:
+            console.print(f"\n[bold cyan]Changes made:[/bold cyan]")
+            for change in result["changes_made"]:
+                console.print(f"  • {change}")
+
+        console.print(f"\n[bold cyan]Files generated:[/bold cyan]")
+        for file_path in files_generated:
+            console.print(f"  • {file_path}")
+
+        console.print(f"\n[bold cyan]Summary:[/bold cyan]")
+        console.print(f"{summary}")
+
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Polish failed:[/bold red]")
+        console.print(f"[red]{e}[/red]")
+        import traceback
+        traceback.print_exc()
+        raise SystemExit(1)
+
+
+@cli.command()
 @click.argument('schema_path', type=click.Path(exists=True))
 @click.option('--data-dir', type=click.Path(exists=True), required=True, help='Directory with Parquet files')
 @click.option('--output-dir', '-o', type=click.Path(), required=True, help='Output directory for CSV + metadata')
